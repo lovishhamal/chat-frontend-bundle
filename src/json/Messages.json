@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "displayName": "Darbie World",
+    "createdAt": "2022-08-11T07:58:45Z",
+    "sender": false,
+    "message": "Donec quis orci eget orci vehicula condimentum. Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est. Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum."
+  },
+  {
+    "id": 2,
+    "displayName": "Caterina Belsher",
+    "createdAt": "2022-03-08T02:37:44Z",
+    "sender": true,
+    "message": "Fusce lacus purus, aliquet at, feugiat non, pretium quis, lectus. Suspendisse potenti. In eleifend quam a odio. In hac habitasse platea dictumst. Maecenas ut massa quis augue luctus tincidunt. Nulla mollis molestie lorem. Quisque ut erat. Curabitur gravida nisi at nibh."
+  },
+  {
+    "id": 3,
+    "displayName": "Aila Byfield",
+    "createdAt": "2022-09-15T14:59:18Z",
+    "sender": false,
+    "message": "Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh. Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros."
+  },
+  {
+    "id": 4,
+    "displayName": "Alexandr Hallowes",
+    "createdAt": "2022-03-31T10:01:31Z",
+    "sender": true,
+    "message": "Sed accumsan felis. Ut at dolor quis odio consequat varius. Integer ac leo. Pellentesque ultrices mattis odio."
+  },
+  {
+    "id": 5,
+    "displayName": "Melamie Willman",
+    "createdAt": "2022-11-14T22:01:56Z",
+    "sender": true,
+    "message": "Proin at turpis a pede posuere nonummy. Integer non velit. Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque. Duis bibendum."
+  },
+  {
+    "id": 6,
+    "displayName": "Mina Tredwell",
+    "createdAt": "2022-01-22T03:55:49Z",
+    "sender": false,
+    "message": "Praesent lectus. Vestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis. Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus."
+  },
+  {
+    "id": 7,
+    "displayName": "Allyce Stallebrass",
+    "createdAt": "2022-07-11T22:53:17Z",
+    "sender": false,
+    "message": "In est risus, auctor sed, tristique in, tempus sit amet, sem. Fusce consequat. Nulla nisl. Nunc nisl. Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum."
+  },
+  {
+    "id": 8,
+    "displayName": "Elfrieda Stuke",
+    "createdAt": "2022-11-09T03:59:59Z",
+    "sender": false,
+    "message": "Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti. Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum."
+  },
+  {
+    "id": 9,
+    "displayName": "Toddie Cantillion",
+    "createdAt": "2022-02-25T16:49:06Z",
+    "sender": true,
+    "message": "Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam vel augue. Vestibulum rutrum rutrum neque. Aenean auctor gravida sem. Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio."
+  },
+  {
+    "id": 10,
+    "displayName": "Lannie Semple",
+    "createdAt": "2022-07-03T19:24:47Z",
+    "sender": true,
+    "message": "Integer ac leo. Pellentesque ultrices mattis odio. Donec vitae nisi. Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus. Curabitur at ipsum ac tellus semper interdum."
+  }
+]

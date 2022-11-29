@@ -1,26 +1,15 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useContext } from "react";
+import { DatePicker } from "antd";
+import Chat from "./pages/chat/chat";
+import { ChatContext, ChatReducer } from "./context/chat";
 
-function App() {
+const App = () => {
+  const { state, dispatch } = ChatReducer();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ChatContext.Provider value={{ state, dispatch }}>
+      <Chat />
+    </ChatContext.Provider>
   );
-}
+};
 
 export default App;
