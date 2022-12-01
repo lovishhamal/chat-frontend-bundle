@@ -29,7 +29,6 @@ const ReceiverBox = ({ item }: { item: IUserMessage }) => {
           {item.message}
         </div>
         <p style={{ alignSelf: "start", marginLeft: 10 }}>
-          {" "}
           {formatDate(item.createdAt, "PPP, p")}
         </p>
       </div>
