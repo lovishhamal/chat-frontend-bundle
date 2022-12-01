@@ -54,7 +54,7 @@ const ChatContent = () => {
       createdAt: getCurrentDate(),
       displayName: "Lovish Hamal",
       id: uuid,
-      message: form.getFieldValue("chat"),
+      message: form.getFieldValue("message"),
     });
     form.resetFields();
   };
@@ -99,7 +99,7 @@ const ChatContent = () => {
           style={{ width: "100%", marginRight: 20 }}
           onFinish={onClickSend}
         >
-          <Form.Item name='chat'>
+          <Form.Item name='message'>
             <TextArea
               rows={4}
               placeholder='Type a message'
