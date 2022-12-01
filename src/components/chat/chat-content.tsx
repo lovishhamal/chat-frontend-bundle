@@ -1,4 +1,4 @@
-import { List } from "antd";
+import { Form, List } from "antd";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import AvatarComponent from "../../common/avatar";
 import { ChatContext } from "../../context/chat";
@@ -27,14 +27,14 @@ function makeid(length: number) {
 const uuid = Math.random() * 100;
 
 const ChatContent = () => {
+  const [form] = Form.useForm();
   const socket = useRef(
     io("http://localhost:4000", {
       transports: ["websocket", "polling"],
     })
   );
-  const { state, dispatch } = useContext<any>(ChatContext);
 
-  const textInputRef = useRef<any>(null);
+  const { state, dispatch } = useContext<any>(ChatContext);
 
   useEffect(() => {
     socket.current.emit("join_room", "dwf_room");
@@ -50,13 +50,13 @@ const ChatContent = () => {
   }, []);
 
   const onClickSend = async () => {
-    const message = textInputRef.current.resizableTextArea.textArea.value;
     socket.current.emit("sendMessage", {
       createdAt: getCurrentDate(),
       displayName: "Lovish Hamal",
       id: uuid,
-      message,
+      message: form.getFieldValue("chat"),
     });
+    form.resetFields();
   };
 
   return (
@@ -94,12 +94,19 @@ const ChatContent = () => {
       <div
         style={{ flexDirection: "row", display: "flex", alignItems: "center" }}
       >
-        <TextArea
-          ref={textInputRef}
-          style={{ marginRight: 20 }}
-          rows={4}
-          placeholder='Type a message'
-        />
+        <Form
+          form={form}
+          style={{ width: "100%", marginRight: 20 }}
+          onFinish={onClickSend}
+        >
+          <Form.Item name='chat'>
+            <TextArea
+              rows={4}
+              placeholder='Type a message'
+              onPressEnter={onClickSend}
+            />
+          </Form.Item>
+        </Form>
         <SendOutlined onClick={onClickSend} />
       </div>
     </div>
