@@ -1,32 +1,19 @@
 import { Form, List } from "antd";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import AvatarComponent from "../../common/avatar";
-import { ChatContext } from "../../context/chat";
-import { IUserMessage } from "../../interface/components/chat/chat";
-import ReceiverBox from "./receiverBox";
-import SenderBox from "./senderBox";
+import React, { useContext, useEffect, useRef } from "react";
+import { ChatContext } from "../../context/chatContext";
+import { IUserMessage } from "../../interface/components/chat/chatInterface";
 import { io } from "socket.io-client";
 import { Input } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import { getCurrentDate } from "../../util/date";
 import { SET_MESSAGE } from "../../constants/actions";
+import { SenderBoxComponent } from "./senderBoxComponent";
+import { ReceiverBoxComponent } from "./receiverBoxComponent";
 
 const { TextArea } = Input;
-
-function makeid(length: number) {
-  var result = "";
-  var characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
-
 const uuid = Math.random() * 100;
 
-const ChatContent = () => {
+export const ChatContentComponent = () => {
   const [form] = Form.useForm();
   const socket = useRef(
     io("http://localhost:4000", {
@@ -84,9 +71,9 @@ const ChatContent = () => {
           dataSource={state.messages}
           renderItem={(item: IUserMessage) => {
             return +uuid === +item.id ? (
-              <SenderBox item={item} />
+              <SenderBoxComponent item={item} />
             ) : (
-              <ReceiverBox item={item} />
+              <ReceiverBoxComponent item={item} />
             );
           }}
         />
@@ -112,5 +99,3 @@ const ChatContent = () => {
     </div>
   );
 };
-
-export default ChatContent;

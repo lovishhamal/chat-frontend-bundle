@@ -1,11 +1,13 @@
 import React from "react";
 import { Layout } from "antd";
-import SideBar from "../../components/chat/sidebar";
-import ChatBody from "../../components/chat/chat-body";
+import {
+  SideBarComponent,
+  ChatBodyComponent,
+} from "../../components/chatComponent";
 
 const { Sider, Content } = Layout;
 
-const Chat = () => {
+const ChatPage = () => {
   return (
     <Layout style={{ height: "100vh" }}>
       <Sider
@@ -16,15 +18,15 @@ const Chat = () => {
         }}
         width={500}
       >
-        <SideBar />
+        <SideBarComponent />
       </Sider>
       <Layout style={{ padding: 20 }}>
         <Content>
-          <ChatBody />
+          <ChatBodyComponent />
         </Content>
       </Layout>
     </Layout>
   );
 };
 
-export default Chat;
+export default ChatPage;

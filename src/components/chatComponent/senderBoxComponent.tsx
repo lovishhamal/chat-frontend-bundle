@@ -1,9 +1,9 @@
 import React from "react";
 import AvatarComponent from "../../common/avatar";
-import { IUserMessage } from "../../interface/components/chat/chat";
+import { IUserMessage } from "../../interface/components/chat/chatInterface";
 import { formatDate } from "../../util/date";
 
-const SenderBox = ({ item }: { item: IUserMessage }) => {
+export const SenderBoxComponent = ({ item }: { item: IUserMessage }) => {
   return (
     <div
       style={{
@@ -41,5 +41,3 @@ const SenderBox = ({ item }: { item: IUserMessage }) => {
     </div>
   );
 };
-
-export default SenderBox;

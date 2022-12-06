@@ -1,12 +1,13 @@
-import { Avatar, Col, Layout, Row, Typography } from "antd";
+import { Layout, Typography } from "antd";
 import React, { useContext } from "react";
 import AvatarComponent from "../../common/avatar";
-import { ChatContext } from "../../context/chat";
-import ChatContent from "./chat-content";
+import { ChatContext } from "../../context/chatContext";
+import { ChatContentComponent } from "./chatContentComponent";
 
 const { Content, Header } = Layout;
 const { Title, Paragraph } = Typography;
-const ChatBody = () => {
+
+export const ChatBodyComponent = () => {
   const {
     state: { user },
   } = useContext<any>(ChatContext);
@@ -55,10 +56,8 @@ const ChatBody = () => {
         </div>
       </div>
       <Content>
-        <ChatContent />
+        <ChatContentComponent />
       </Content>
     </Layout>
   );
 };
-
-export default ChatBody;

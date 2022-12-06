@@ -2,15 +2,15 @@ import React, { useContext, useEffect, useState } from "react";
 import mockUsers from "../../json/MOCK_DATA.json";
 
 import { Avatar, Badge, Divider, List, Skeleton, Typography } from "antd";
-import { IUserProps } from "../../interface/components/chat/chat";
+import { IUserProps } from "../../interface/components/chat/chatInterface";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { ChatContext } from "../../context/chat";
+import { ChatContext } from "../../context/chatContext";
 import { SET_USER } from "../../constants/actions";
 import AvatarComponent from "../../common/avatar";
 
 const { Title, Paragraph } = Typography;
 
-const SideBar = () => {
+export const SideBarComponent = () => {
   const { dispatch } = useContext<any>(ChatContext);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<IUserProps[]>();
@@ -81,5 +81,3 @@ const SideBar = () => {
     </div>
   );
 };
-
-export default SideBar;
