@@ -2,7 +2,7 @@ import React from "react";
 import { Layout } from "antd";
 import {
   SideBarComponent,
-  ChatBodyComponent,
+  ChatLayoutComponent,
 } from "../../components/chatComponent";
 
 const { Sider, Content } = Layout;
@@ -22,7 +22,7 @@ const ChatPage = () => {
       </Sider>
       <Layout style={{ padding: 20 }}>
         <Content>
-          <ChatBodyComponent />
+          <ChatLayoutComponent />
         </Content>
       </Layout>
     </Layout>
