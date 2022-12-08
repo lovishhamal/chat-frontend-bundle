@@ -1,13 +1,11 @@
-import React, { useContext } from "react";
-import { DatePicker } from "antd";
 import { ChatContext, ChatReducer } from "./context/chatContext";
-import ChatPage from "./pages/chat";
+import { AppRoutes } from "./routes";
 
 const App = () => {
   const { state, dispatch } = ChatReducer();
   return (
     <ChatContext.Provider value={{ state, dispatch }}>
-      <ChatPage />
+      <AppRoutes />;
     </ChatContext.Provider>
   );
 };
