@@ -3,13 +3,17 @@ import { Button, Checkbox, Form, Input, Typography } from "antd";
 import FormItem from "antd/es/form/FormItem";
 import { useNavigate } from "react-router-dom";
 import { uiRoutes } from "../../constants/uiRoutes";
+import { loginService } from "../../services/auth";
 
 const { Title } = Typography;
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+
   const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
+    loginService(values).then((data: any) => {
+      navigate(uiRoutes.dashboard);
+    });
   };
 
   return (
@@ -31,7 +35,7 @@ export const LoginPage = () => {
         onFinish={onFinish}
       >
         <Form.Item
-          name='username'
+          name='userName'
           rules={[{ required: true, message: "Please input your Username!" }]}
         >
           <Input

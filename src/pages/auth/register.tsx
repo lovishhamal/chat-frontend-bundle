@@ -2,14 +2,16 @@ import { LockOutlined, UserOutlined, InboxOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, Typography, Upload } from "antd";
 import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
 import FormItem from "antd/es/form/FormItem";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { uiRoutes } from "../../constants/uiRoutes";
 import ImgCrop from "antd-img-crop";
 import { useState } from "react";
+import { registerService } from "../../services/auth";
 
 const { Title } = Typography;
 
 export const RegisterPage = () => {
+  const navigate = useNavigate();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
@@ -32,7 +34,22 @@ export const RegisterPage = () => {
   };
 
   const onFinish = (values: any) => {
-    console.log("Received values of form: ", values);
+    let payload = {
+      ...values,
+      image: {
+        name: fileList[0].name,
+        size: fileList[0].size,
+        data: fileList[0].thumbUrl,
+        type: fileList[0].type,
+      },
+    };
+
+    const { confirmPassword, ...rest } = payload;
+    registerService(rest)
+      .then((data) => {
+        navigate(uiRoutes.auth.login);
+      })
+      .catch((err) => {});
   };
 
   return (
@@ -54,7 +71,7 @@ export const RegisterPage = () => {
         onFinish={onFinish}
       >
         <Form.Item
-          name='username'
+          name='userName'
           rules={[{ required: true, message: "Please input your Username!" }]}
         >
           <Input
@@ -82,7 +99,7 @@ export const RegisterPage = () => {
           />
         </Form.Item>
         <Form.Item
-          name='confirm'
+          name='confirmPassword'
           dependencies={["password"]}
           hasFeedback
           rules={[
@@ -115,7 +132,7 @@ export const RegisterPage = () => {
             htmlType='submit'
             className='login-form-button'
           >
-            Log in
+            Register
           </Button>
         </Form.Item>
         <Form.Item
