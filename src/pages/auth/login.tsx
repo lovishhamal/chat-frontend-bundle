@@ -17,7 +17,7 @@ const LoginPage = () => {
 
   const onFinish = (values: any) => {
     loginService(values).then((data: any) => {
-      LocalStorage.setLocalStorage("user", data.data);
+      LocalStorage.setLocalStorage("user", data);
       dispatch({ type: SET_LOGGED_IN_USER, payload: data.data });
       navigate(uiRoutes.dashboard);
     });

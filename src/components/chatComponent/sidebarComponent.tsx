@@ -14,7 +14,7 @@ const { Title, Paragraph } = Typography;
 export const SideBarComponent = () => {
   const { dispatch } = useContext<any>(ChatContext);
   const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState<IUserProps[]>();
+  const [users, setUsers] = useState<IUserProps[]>([]);
 
   const getUsers = () => {
     getUserService().then((data) => {
@@ -57,7 +57,7 @@ export const SideBarComponent = () => {
         <InfiniteScroll
           dataLength={users?.length ?? 0}
           next={loadMoreData}
-          hasMore={(users?.length && users?.length < 10) || false}
+          hasMore={users?.length < 0 || false}
           loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
           endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
           scrollableTarget='scrollableDiv'
