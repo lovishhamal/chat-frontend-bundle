@@ -1,11 +1,8 @@
 export interface IUserProps {
   id: number;
-  displayName: string;
+  userName: string;
   createdAt: string;
   image: string;
-  message: string;
-  active: boolean;
-  lastMessage: string;
 }
 
 export interface IInitialChatProps {

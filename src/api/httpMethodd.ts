@@ -15,4 +15,12 @@ export class httpMethod {
       throw error;
     }
   }
+  static async get(path: string) {
+    try {
+      const response = await baseRequest.get(path);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

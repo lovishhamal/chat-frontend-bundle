@@ -4,7 +4,7 @@ import { apiRoutes } from "../../constants/apiRoutes";
 export const registerService = async (payload: any) => {
   try {
     const response = await httpMethod.post(apiRoutes.auth.register, payload);
-    return response;
+    return response.data.data;
   } catch (error) {
     throw error;
   }
@@ -13,7 +13,7 @@ export const registerService = async (payload: any) => {
 export const loginService = async (payload: any) => {
   try {
     const response = await httpMethod.post(apiRoutes.auth.login, payload);
-    return response;
+    return response.data.data;
   } catch (error) {
     throw error;
   }
