@@ -1,7 +1,7 @@
-import { SET_MESSAGE, SET_USER } from "../../constants/actions";
+import { SET_MESSAGE, SET_USER } from "../constants/actions";
 import React, { useReducer } from "react";
-import { IInitialChatProps } from "../../interface/components/chat/chatInterface";
-import messages from "../../json/Messages.json";
+import { IInitialChatProps } from "../interface/components/chat/chatInterface";
+import messages from "../json/Messages.json";
 const ChatContext = React.createContext({});
 
 const initialState: IInitialChatProps = {

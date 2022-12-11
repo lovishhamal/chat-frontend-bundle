@@ -1,17 +1,24 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, Typography } from "antd";
 import FormItem from "antd/es/form/FormItem";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { SET_LOGGED_IN_USER } from "../../constants/actions";
 import { uiRoutes } from "../../constants/uiRoutes";
+import { AuthContext } from "../../context";
 import { loginService } from "../../services/auth";
+import { LocalStorage } from "../../util/localStorage";
 
 const { Title } = Typography;
 
-export const LoginPage = () => {
+const LoginPage = () => {
   const navigate = useNavigate();
+  const { dispatch } = useContext<any>(AuthContext);
 
   const onFinish = (values: any) => {
     loginService(values).then((data: any) => {
+      LocalStorage.setLocalStorage("user", data.data.data);
+      dispatch({ type: SET_LOGGED_IN_USER, payload: data.data.data });
       navigate(uiRoutes.dashboard);
     });
   };
@@ -97,3 +104,5 @@ export const LoginPage = () => {
     </div>
   );
 };
+
+export default LoginPage;

@@ -1,12 +1,16 @@
-import { ChatContext, ChatReducer } from "./context/chatContext";
+import { useContext } from "react";
+import { BrowserRouter } from "react-router-dom";
+import { AuthContext, AuthReducer } from "./context";
 import { AppRoutes } from "./routes";
 
 const App = () => {
-  const { state, dispatch } = ChatReducer();
+  const { state, dispatch } = AuthReducer();
   return (
-    <ChatContext.Provider value={{ state, dispatch }}>
-      <AppRoutes />;
-    </ChatContext.Provider>
+    <AuthContext.Provider value={{ state, dispatch }}>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </AuthContext.Provider>
   );
 };
 

@@ -10,7 +10,7 @@ import { registerService } from "../../services/auth";
 
 const { Title } = Typography;
 
-export const RegisterPage = () => {
+const RegisterPage = () => {
   const navigate = useNavigate();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
@@ -166,3 +166,5 @@ export const RegisterPage = () => {
     </div>
   );
 };
+
+export default RegisterPage;
