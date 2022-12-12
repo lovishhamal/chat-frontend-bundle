@@ -2,7 +2,14 @@ export interface IUserProps {
   id: number;
   userName: string;
   createdAt: string;
-  image: string;
+  image: Image;
+}
+
+interface Image {
+  name?: string;
+  size?: number;
+  data?: string;
+  type?: string;
 }
 
 export interface IInitialChatProps {

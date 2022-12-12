@@ -3,6 +3,7 @@ import { Button, Checkbox, Form, Input, Typography } from "antd";
 import FormItem from "antd/es/form/FormItem";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { showNotification } from "../../common";
 import { SET_LOGGED_IN_USER } from "../../constants/actions";
 import { uiRoutes } from "../../constants/uiRoutes";
 import { AuthContext } from "../../context";
@@ -16,11 +17,15 @@ const LoginPage = () => {
   const { dispatch } = useContext<any>(AuthContext);
 
   const onFinish = (values: any) => {
-    loginService(values).then((data: any) => {
-      LocalStorage.setLocalStorage("user", data);
-      dispatch({ type: SET_LOGGED_IN_USER, payload: data.data });
-      navigate(uiRoutes.dashboard);
-    });
+    loginService(values)
+      .then((data: any) => {
+        LocalStorage.setLocalStorage("user", data);
+        dispatch({ type: SET_LOGGED_IN_USER, payload: data.data });
+        navigate(uiRoutes.dashboard);
+      })
+      .catch((err) => {
+        showNotification({ type: "error", message: err.data?.message });
+      });
   };
 
   return (

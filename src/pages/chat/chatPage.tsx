@@ -19,7 +19,7 @@ const ChatPage = () => {
             padding: 0,
             backgroundColor: "white",
           }}
-          width={500}
+          width={400}
         >
           <SideBarComponent />
         </Sider>

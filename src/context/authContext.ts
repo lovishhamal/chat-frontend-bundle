@@ -12,7 +12,7 @@ const reducer = (state: any = initialState, action: any) => {
     case SET_LOGGED_IN_USER:
       return {
         ...state,
-        user: action.payload,
+        user: JSON.parse(action.payload),
       };
   }
 };
