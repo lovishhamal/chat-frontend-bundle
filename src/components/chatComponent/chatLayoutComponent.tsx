@@ -37,7 +37,7 @@ export const ChatLayoutComponent = () => {
             }}
           >
             <div style={{ display: "flex", alignItems: "flex-start" }}>
-              <AvatarComponent image={user.image} active={user.active} />
+              <AvatarComponent image={user.image?.data} active={user.active} />
               <div
                 style={{
                   alignSelf: "flex-start",

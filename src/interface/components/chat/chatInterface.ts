@@ -1,8 +1,8 @@
 export interface IUserProps {
-  id: number;
   userName: string;
   createdAt: string;
   image: Image;
+  _id: string;
 }
 
 interface Image {
@@ -18,7 +18,7 @@ export interface IInitialChatProps {
 }
 
 export interface IUserMessage {
-  id: string;
+  sentBy: string;
   displayName: string;
   createdAt: string;
   sender: boolean;

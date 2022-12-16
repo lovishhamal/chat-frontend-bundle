@@ -2,18 +2,22 @@ import React, { useContext, useEffect, useState } from "react";
 import mockUsers from "../../json/MOCK_DATA.json";
 
 import { Avatar, Badge, Divider, List, Skeleton, Typography } from "antd";
-import { IUserProps } from "../../interface/components/chat/chatInterface";
+import {
+  IUserMessage,
+  IUserProps,
+} from "../../interface/components/chat/chatInterface";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { ChatContext } from "../../context/chatContext";
-import { SET_USER } from "../../constants/actions";
+import { SET_INITIAL_MESSAGE, SET_USER } from "../../constants/actions";
 import AvatarComponent from "../../common/avatar";
-import { getUserService } from "../../services/chat";
+import { getUserService } from "../../services/chat/user";
 import { AuthContext } from "../../context";
+import { getMessageService } from "../../services/chat/message";
 
 const { Title, Paragraph } = Typography;
 
 export const SideBarComponent = () => {
-  const { dispatch } = useContext<any>(ChatContext);
+  const { dispatch, state: chatState } = useContext<any>(ChatContext);
   const { state } = useContext<any>(AuthContext);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<IUserProps[]>([]);
@@ -38,6 +42,9 @@ export const SideBarComponent = () => {
   };
 
   const onPressUser = (item: IUserProps) => {
+    getMessageService(item._id).then((data: IUserMessage[]) => {
+      dispatch({ type: SET_INITIAL_MESSAGE, payload: data });
+    });
     dispatch({
       type: SET_USER,
       payload: item,

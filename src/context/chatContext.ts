@@ -1,4 +1,8 @@
-import { SET_MESSAGE, SET_USER } from "../constants/actions";
+import {
+  SET_INITIAL_MESSAGE,
+  SET_MESSAGE,
+  SET_USER,
+} from "../constants/actions";
 import React, { useReducer } from "react";
 import { IInitialChatProps } from "../interface/components/chat/chatInterface";
 import messages from "../json/Messages.json";
@@ -15,6 +19,12 @@ const reducer = (state: any = initialState, action: any) => {
       return {
         ...state,
         user: action.payload,
+      };
+
+    case SET_INITIAL_MESSAGE:
+      return {
+        ...state,
+        messages: action.payload,
       };
     case SET_MESSAGE:
       return {

@@ -6,22 +6,24 @@ import { io } from "socket.io-client";
 import { Input } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import { getCurrentDate } from "../../util/date";
-import { SET_MESSAGE } from "../../constants/actions";
+import { SET_INITIAL_MESSAGE, SET_MESSAGE } from "../../constants/actions";
 import { SenderBoxComponent } from "./senderBoxComponent";
 import { ReceiverBoxComponent } from "./receiverBoxComponent";
+import { AuthContext } from "../../context";
+import { getMessageService } from "../../services/chat/message";
 
 const { TextArea } = Input;
-const uuid = Math.random() * 100;
 
 export const ChatBodyComponent = () => {
   const [form] = Form.useForm();
   const socket = useRef(
-    io("http://localhost:4000", {
+    io("http://localhost:5000", {
       transports: ["websocket", "polling"],
     })
   );
 
   const { state, dispatch } = useContext<any>(ChatContext);
+  const { state: authState } = useContext<any>(AuthContext);
 
   useEffect(() => {
     socket.current.emit("join_room", "dwf_room");
@@ -36,13 +38,17 @@ export const ChatBodyComponent = () => {
     });
   }, []);
 
-  const onClickSend = async () => {
+  const onClickSend = () => {
+    console.log("mogo", state.user?._id);
+
     socket.current.emit("sendMessage", {
+      sentBy: authState.user?._id,
+      sentTo: state.user?._id,
       createdAt: getCurrentDate(),
       displayName: "Lovish Hamal",
-      id: uuid,
       message: form.getFieldValue("message"),
     });
+
     form.resetFields();
   };
 
@@ -70,7 +76,7 @@ export const ChatBodyComponent = () => {
           itemLayout='horizontal'
           dataSource={state.messages}
           renderItem={(item: IUserMessage) => {
-            return +uuid === +item.id ? (
+            return authState?.user._id === item.sentBy ? (
               <SenderBoxComponent item={item} />
             ) : (
               <ReceiverBoxComponent item={item} />
