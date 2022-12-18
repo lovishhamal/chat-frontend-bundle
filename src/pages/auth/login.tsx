@@ -20,7 +20,7 @@ const LoginPage = () => {
     loginService(values)
       .then((data: any) => {
         LocalStorage.setLocalStorage("user", data);
-        dispatch({ type: SET_LOGGED_IN_USER, payload: data.data });
+        dispatch({ type: SET_LOGGED_IN_USER, payload: JSON.stringify(data) });
         navigate(uiRoutes.dashboard);
       })
       .catch((err) => {
