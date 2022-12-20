@@ -13,6 +13,7 @@ import AvatarComponent from "../../common/avatar";
 import { getUserService } from "../../services/chat/user";
 import { AuthContext } from "../../context";
 import { getMessageService } from "../../services/chat/message";
+import { AutoCompleteSearch } from "../../common";
 
 const { Title, Paragraph } = Typography;
 
@@ -53,7 +54,16 @@ export const SideBarComponent = () => {
 
   return (
     <div style={{ margin: "-20px 20px 0px 20px" }}>
-      <Title>Users</Title>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+        }}
+      >
+        <Title>Users</Title>
+        <AutoCompleteSearch placeholder='Search your friends' />
+      </div>
       <div
         id='scrollableDiv'
         style={{
