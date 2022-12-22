@@ -1,41 +1,74 @@
-import { AutoComplete, Input, SelectProps } from "antd";
+import { AutoComplete, Input, SelectProps, Spin } from "antd";
 import { useState } from "react";
+import { getUserListService } from "../../services/chat/user";
 
-const searchResult = (query: string) =>
-  new Array(5)
-    .join(".")
-    .split(".")
-    .map((_, idx) => {
-      const category = `${query}${idx}`;
-      return {
-        value: category,
-        label: (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <span>
-              Found {query} on{" "}
-              <a
-                href={`https://s.taobao.com/search?q=${query}`}
-                target='_blank'
-                rel='noopener noreferrer'
+const searchResult = (loading: boolean, query?: any) => {
+  return loading
+    ? [
+        {
+          value: "spin",
+          label: (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Spin />
+            </div>
+          ),
+        },
+      ]
+    : query?.length
+    ? new Array(query?.length)
+        .join(".")
+        .split(".")
+        .map((_, idx) => {
+          return {
+            value: query[idx]._id,
+            label: (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
               >
-                {category}
-              </a>
-            </span>
-          </div>
-        ),
-      };
-    });
+                <span>Found {query[idx]?.userName} </span>
+              </div>
+            ),
+          };
+        })
+    : new Array(query?.length)
+        .join(".")
+        .split(".")
+        .map((_, idx) => {
+          return {
+            value: "user not ffound",
+            label: (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span>User not found</span>
+              </div>
+            ),
+          };
+        });
+};
 
 const AutoCompleteSearch = ({ placeholder }: { placeholder?: string }) => {
   const [options, setOptions] = useState<SelectProps<object>["options"]>([]);
 
-  const handleSearch = (value: string) => {
-    setOptions(value ? searchResult(value) : []);
+  const handleSearch = async (value: string) => {
+    if (value.length === 3) {
+      setOptions(searchResult(true));
+      const response = await getUserListService(value);
+
+      setOptions(value ? searchResult(false, response) : []);
+    }
   };
 
   const onSelect = (value: string) => {

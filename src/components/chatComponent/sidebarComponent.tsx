@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
-import mockUsers from "../../json/MOCK_DATA.json";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { PlusCircleFilled } from "@ant-design/icons";
 
-import { Avatar, Badge, Divider, List, Skeleton, Typography } from "antd";
+import { Divider, List, Skeleton, Typography } from "antd";
 import {
   IUserMessage,
   IUserProps,
@@ -13,11 +13,12 @@ import AvatarComponent from "../../common/avatar";
 import { getUserService } from "../../services/chat/user";
 import { AuthContext } from "../../context";
 import { getMessageService } from "../../services/chat/message";
-import { AutoCompleteSearch } from "../../common";
+import { AutoCompleteSearch, CustomModal } from "../../common";
 
 const { Title, Paragraph } = Typography;
 
 export const SideBarComponent = () => {
+  const [open, setOpen] = useState<boolean>(false);
   const { dispatch, state: chatState } = useContext<any>(ChatContext);
   const { state } = useContext<any>(AuthContext);
   const [loading, setLoading] = useState(false);
@@ -53,54 +54,65 @@ export const SideBarComponent = () => {
   };
 
   return (
-    <div style={{ margin: "-20px 20px 0px 20px" }}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-        }}
-      >
-        <Title>Users</Title>
-        <AutoCompleteSearch placeholder='Search your friends' />
-      </div>
-      <div
-        id='scrollableDiv'
-        style={{
-          height: "90vh",
-          overflow: "auto",
-          padding: "0 16px",
-        }}
-      >
-        <InfiniteScroll
-          dataLength={users?.length ?? 0}
-          next={loadMoreData}
-          hasMore={users?.length < 0 || false}
-          loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
-          endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
-          scrollableTarget='scrollableDiv'
+    <>
+      <CustomModal open={open} setOpen={setOpen}>
+        <AutoCompleteSearch placeholder='Type at least 3 letters' />
+      </CustomModal>
+      <div style={{ margin: "-20px 20px 0px 20px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
         >
-          <List
-            dataSource={users}
-            renderItem={(item: IUserProps) => (
-              <div
-                style={{ cursor: "pointer" }}
-                onClick={() => onPressUser(item)}
-              >
-                <List.Item>
-                  <List.Item.Meta
-                    avatar={
-                      <AvatarComponent image={item.image.data} active={true} />
-                    }
-                    title={<Title level={5}>{item.userName}</Title>}
-                    description={<Paragraph>{"iitem"}</Paragraph>}
-                  />
-                </List.Item>
-              </div>
-            )}
-          />
-        </InfiniteScroll>
+          <Title>Users</Title>
+          <div onClick={() => setOpen(true)}>
+            <PlusCircleFilled style={{ fontSize: 25, marginTop: 20 }} />
+          </div>
+        </div>
+        <div
+          id='scrollableDiv'
+          style={{
+            height: "90vh",
+            overflow: "auto",
+            padding: "0 16px",
+          }}
+        >
+          <InfiniteScroll
+            dataLength={users?.length ?? 0}
+            next={loadMoreData}
+            hasMore={users?.length < 0 || false}
+            loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
+            endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+            scrollableTarget='scrollableDiv'
+          >
+            <List
+              dataSource={users}
+              renderItem={(item: IUserProps) => (
+                <div
+                  style={{ cursor: "pointer" }}
+                  onClick={() => onPressUser(item)}
+                >
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={
+                        <AvatarComponent
+                          image={item.image.data}
+                          active={true}
+                        />
+                      }
+                      title={<Title level={5}>{item.userName}</Title>}
+                      description={<Paragraph>{"iitem"}</Paragraph>}
+                    />
+                  </List.Item>
+                </div>
+              )}
+            />
+          </InfiniteScroll>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
