@@ -59,7 +59,13 @@ const searchResult = (loading: boolean, query?: any) => {
         });
 };
 
-const AutoCompleteSearch = ({ placeholder }: { placeholder?: string }) => {
+const AutoCompleteSearch = ({
+  placeholder,
+  setValue,
+}: {
+  placeholder?: string;
+  setValue: any;
+}) => {
   const [options, setOptions] = useState<SelectProps<object>["options"]>([]);
 
   const handleSearch = async (value: string) => {
@@ -72,7 +78,7 @@ const AutoCompleteSearch = ({ placeholder }: { placeholder?: string }) => {
   };
 
   const onSelect = (value: string) => {
-    console.log("onSelect", value);
+    setValue(value);
   };
 
   return (

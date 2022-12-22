@@ -14,6 +14,7 @@ import { getUserService } from "../../services/chat/user";
 import { AuthContext } from "../../context";
 import { getMessageService } from "../../services/chat/message";
 import { AutoCompleteSearch, CustomModal } from "../../common";
+import { SearchUserrModal } from "../user";
 
 const { Title, Paragraph } = Typography;
 
@@ -56,7 +57,7 @@ export const SideBarComponent = () => {
   return (
     <>
       <CustomModal open={open} setOpen={setOpen}>
-        <AutoCompleteSearch placeholder='Type at least 3 letters' />
+        <SearchUserrModal />
       </CustomModal>
       <div style={{ margin: "-20px 20px 0px 20px" }}>
         <div
