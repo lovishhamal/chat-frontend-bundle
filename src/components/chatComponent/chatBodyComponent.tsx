@@ -1,5 +1,5 @@
 import { Form, List } from "antd";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ChatContext } from "../../context/chatContext";
 import { IUserMessage } from "../../interface/components/chat/chatInterface";
 import { io } from "socket.io-client";
@@ -10,19 +10,22 @@ import { SET_MESSAGE } from "../../constants/actions";
 import { SenderBoxComponent } from "./senderBoxComponent";
 import { ReceiverBoxComponent } from "./receiverBoxComponent";
 import { AuthContext } from "../../context";
+import { CustomModal } from "../../common";
 
 const { TextArea } = Input;
 
 export const ChatBodyComponent = () => {
+  const { state, dispatch } = useContext<any>(ChatContext);
+  const { state: authState } = useContext<any>(AuthContext);
   const [form] = Form.useForm();
+
   const socket = useRef(
     io("http://localhost:5000", {
       transports: ["websocket", "polling"],
     })
   );
 
-  const { state, dispatch } = useContext<any>(ChatContext);
-  const { state: authState } = useContext<any>(AuthContext);
+  const [open, setOpen] = useState(true);
 
   useEffect(() => {
     socket.current.emit("join_room", "dwf_room");
@@ -82,7 +85,11 @@ export const ChatBodyComponent = () => {
         />
       </div>
       <div
-        style={{ flexDirection: "row", display: "flex", alignItems: "center" }}
+        style={{
+          flexDirection: "row",
+          display: "flex",
+          alignItems: "center",
+        }}
       >
         <Form
           form={form}

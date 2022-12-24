@@ -1,12 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Divider, List, Skeleton } from "antd";
 import Paragraph from "antd/es/typography/Paragraph";
 import Title from "antd/es/typography/Title";
 import InfiniteScroll from "react-infinite-scroll-component";
 import AvatarComponent from "../../../common/avatar";
 import { IUserProps } from "../../../interface/components/chat/chatInterface";
-
-import { AuthContext, ChatContext } from "../../../context";
+import { AuthContext } from "../../../context";
 import { postUserConnection } from "../../../services/chat/user";
 
 const SearchUserList = ({ data }: { data: any }) => {
