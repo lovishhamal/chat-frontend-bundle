@@ -7,11 +7,18 @@ import AvatarComponent from "../../../common/avatar";
 import { IUserProps } from "../../../interface/components/chat/chatInterface";
 
 import { AuthContext, ChatContext } from "../../../context";
+import { postUserConnection } from "../../../services/chat/user";
 
 const SearchUserList = ({ data }: { data: any }) => {
+  const { state } = useContext<any>(AuthContext);
   const [loading, setLoading] = useState(false);
 
-  const onPressUser = (item: IUserProps) => {};
+  const onPressUser = (item: IUserProps) => {
+    postUserConnection({
+      id: state?.user?._id,
+      connectionId: { id: item._id },
+    }).then((data: any) => {});
+  };
 
   const loadMoreData = () => {
     if (loading) {

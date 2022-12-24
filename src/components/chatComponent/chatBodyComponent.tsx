@@ -1,16 +1,15 @@
 import { Form, List } from "antd";
-import React, { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { ChatContext } from "../../context/chatContext";
 import { IUserMessage } from "../../interface/components/chat/chatInterface";
 import { io } from "socket.io-client";
 import { Input } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import { getCurrentDate } from "../../util/date";
-import { SET_INITIAL_MESSAGE, SET_MESSAGE } from "../../constants/actions";
+import { SET_MESSAGE } from "../../constants/actions";
 import { SenderBoxComponent } from "./senderBoxComponent";
 import { ReceiverBoxComponent } from "./receiverBoxComponent";
 import { AuthContext } from "../../context";
-import { getMessageService } from "../../services/chat/message";
 
 const { TextArea } = Input;
 
@@ -39,8 +38,6 @@ export const ChatBodyComponent = () => {
   }, []);
 
   const onClickSend = () => {
-    console.log("mogo", state.user?._id);
-
     socket.current.emit("sendMessage", {
       sentBy: authState.user?._id,
       sentTo: state.user?._id,

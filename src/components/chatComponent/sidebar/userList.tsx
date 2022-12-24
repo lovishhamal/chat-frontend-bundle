@@ -22,7 +22,20 @@ const UserList = () => {
 
   const getUsers = () => {
     getUserService(state.user._id).then((data) => {
-      setUsers(data);
+      if (data?.length) {
+        setUsers(data);
+        dispatch({
+          type: SET_USER,
+          payload: data[0],
+        });
+        const payload = {
+          sentBy: state.user._id,
+          sentTo: data[0]._id,
+        };
+        getMessageService(payload).then((data: IUserMessage[]) => {
+          dispatch({ type: SET_INITIAL_MESSAGE, payload: data });
+        });
+      }
     });
   };
 
@@ -31,7 +44,11 @@ const UserList = () => {
   }, []);
 
   const onPressUser = (item: IUserProps) => {
-    getMessageService(item._id).then((data: IUserMessage[]) => {
+    const payload = {
+      sentBy: state.user._id,
+      sentTo: item._id,
+    };
+    getMessageService(payload).then((data: IUserMessage[]) => {
       dispatch({ type: SET_INITIAL_MESSAGE, payload: data });
     });
     dispatch({

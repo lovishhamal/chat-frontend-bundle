@@ -12,11 +12,22 @@ export const getUserService = async (id: string) => {
   }
 };
 
-export const getUserListService = async (value: string) => {
+export const getUserListService = async (id: string, payload: string) => {
   try {
     const response = await httpMethod.get(
-      apiRoutes.chat.users.getUserList.replace("value", value)
+      apiRoutes.chat.users.getUserFriends
+        .replace(":id", id)
+        .replace("value", payload)
     );
+    return response.data.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const postUserConnection = async (value: any) => {
+  try {
+    const response = await httpMethod.post(apiRoutes.user.connection, value);
     return response.data.data;
   } catch (error) {
     throw error;

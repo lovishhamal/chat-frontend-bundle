@@ -3,8 +3,11 @@ export const apiRoutes = {
   chat: {
     users: {
       getAll: "/users/:id",
-      getUserList: "/user/findFriends?keyword=value",
+      getUserFriends: "/user/findFriends/:id?keyword=value",
     },
-    messages: { getAll: "/message/findAll/:id" },
+    messages: { getAll: "/message/findAll" },
+  },
+  user: {
+    connection: "/user/connection",
   },
 };

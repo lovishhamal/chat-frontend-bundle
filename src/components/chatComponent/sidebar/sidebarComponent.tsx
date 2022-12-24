@@ -1,17 +1,19 @@
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../../context";
 import { getUserListService } from "../../../services/chat/user";
 import SearchUserList from "./searchUserList";
 import UserList from "./userList";
 
 export const SideBarComponent = () => {
   const [data, setData] = useState<any>([]);
+  const { state } = useContext<any>(AuthContext);
 
   const onChange = async (e: any) => {
     const { value } = e.target;
     if (value?.length == 2) {
-      const response = await getUserListService(value);
+      const response = await getUserListService(state?.user._id, value);
       setData(response);
     }
     if (!value) {
@@ -29,7 +31,7 @@ export const SideBarComponent = () => {
             alignItems: "start",
           }}
         >
-          <Title>Users</Title>
+          <Title>Hi {state?.user.userName ?? ""}</Title>
           <Search
             placeholder='Email, userName'
             onChange={onChange}

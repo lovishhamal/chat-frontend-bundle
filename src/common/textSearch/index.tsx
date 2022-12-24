@@ -71,9 +71,6 @@ const AutoCompleteSearch = ({
   const handleSearch = async (value: string) => {
     if (value.length === 3) {
       setOptions(searchResult(true));
-      const response = await getUserListService(value);
-
-      setOptions(value ? searchResult(false, response) : []);
     }
   };
 

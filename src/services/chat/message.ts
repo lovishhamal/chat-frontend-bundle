@@ -1,10 +1,11 @@
 import { httpMethod } from "../../api/httpMethodd";
 import { apiRoutes } from "../../constants/apiRoutes";
 
-export const getMessageService = async (id: string) => {
+export const getMessageService = async (payload: any) => {
   try {
-    const response = await httpMethod.get(
-      apiRoutes.chat.messages.getAll.replace(":id", id)
+    const response = await httpMethod.post(
+      apiRoutes.chat.messages.getAll,
+      payload
     );
 
     return response.data.data;
