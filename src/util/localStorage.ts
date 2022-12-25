@@ -6,4 +6,8 @@ export class LocalStorage {
   static getLocalStorage(key: string) {
     return localStorage.getItem(key);
   }
+
+  static removeLocalStorage(key: string) {
+    return localStorage.removeItem(key);
+  }
 }

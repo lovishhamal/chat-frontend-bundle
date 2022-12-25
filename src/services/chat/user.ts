@@ -3,6 +3,8 @@ import { apiRoutes } from "../../constants/apiRoutes";
 
 export const getUserService = async (id: string) => {
   try {
+    console.log("id", id);
+
     const response = await httpMethod.get(
       apiRoutes.chat.users.getAll.replace(":id", id)
     );

@@ -25,8 +25,6 @@ export const ChatBodyComponent = () => {
     })
   );
 
-  const [open, setOpen] = useState(true);
-
   useEffect(() => {
     socket.current.emit("join_room", "dwf_room");
     socket.current.off("initialMessage").on("initialMessage", (res: any) => {

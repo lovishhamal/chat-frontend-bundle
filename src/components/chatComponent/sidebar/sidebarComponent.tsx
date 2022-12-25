@@ -5,8 +5,13 @@ import { AuthContext } from "../../../context";
 import { getUserListService } from "../../../services/chat/user";
 import SearchUserList from "./searchUserList";
 import UserList from "./userList";
+import { LogoutOutlined } from "@ant-design/icons";
+import { logout } from "../../../util/common";
+import { useNavigate } from "react-router-dom";
+import { uiRoutes } from "../../../constants/uiRoutes";
 
 export const SideBarComponent = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState<any>([]);
   const { state } = useContext<any>(AuthContext);
 
@@ -31,7 +36,29 @@ export const SideBarComponent = () => {
             alignItems: "start",
           }}
         >
-          <Title>Hi {state?.user.userName ?? ""}</Title>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              alignContent: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Title>Hi {state?.user.userName ?? ""}</Title>
+            <LogoutOutlined
+              onClick={() =>
+                logout().then(() =>
+                  navigate(uiRoutes.auth.login, { replace: true })
+                )
+              }
+              style={{
+                fontSize: 30,
+                marginTop: 20,
+              }}
+            />
+          </div>
           <Search
             placeholder='Email, userName'
             onChange={onChange}

@@ -1,6 +1,5 @@
 import { AutoComplete, Input, SelectProps, Spin } from "antd";
 import { useState } from "react";
-import { getUserListService } from "../../services/chat/user";
 
 const searchResult = (loading: boolean, query?: any) => {
   return loading
