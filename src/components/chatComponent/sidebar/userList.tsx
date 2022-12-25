@@ -50,8 +50,9 @@ const UserList = () => {
       connectionId: item.connection[0].connectionId,
     });
     const payload = {
-      messageId: chatState.user.messageId,
+      messageId: item.messageId,
     };
+
     getMessageService(payload).then((data: IUserMessage[]) => {
       dispatch({ type: SET_INITIAL_MESSAGE, payload: data });
     });
