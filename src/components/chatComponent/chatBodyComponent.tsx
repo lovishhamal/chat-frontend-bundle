@@ -32,7 +32,7 @@ export const ChatBodyComponent = () => {
       .on(state.user.connectionId, (res: any) => {
         dispatch({ type: SET_MESSAGE, payload: res });
       });
-  }, [state.connectionId]);
+  }, [state.user.connectionId]);
 
   const onClickSend = () => {
     socket.emit("sendMessage", {
