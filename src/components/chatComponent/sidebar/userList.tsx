@@ -11,17 +11,19 @@ import {
 import { getMessageService } from "../../../services/chat/message";
 import { SET_INITIAL_MESSAGE, SET_USER } from "../../../constants/actions";
 import { AuthContext, ChatContext } from "../../../context";
-import { getUserService } from "../../../services/chat/user";
+import { geAllConnectionService } from "../../../services/chat/user";
+import { socketIo } from "../../../util/socket";
 
 const UserList = () => {
+  const socket = socketIo();
   const { state } = useContext<any>(AuthContext);
-  const { dispatch } = useContext<any>(ChatContext);
+  const { state: chatState, dispatch } = useContext<any>(ChatContext);
 
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<IUserProps[]>([]);
 
   const getUsers = () => {
-    getUserService(state.user._id).then((data) => {
+    geAllConnectionService(state.user._id).then((data) => {
       if (data?.length) {
         setUsers(data);
         dispatch({
@@ -29,11 +31,10 @@ const UserList = () => {
           payload: data[0],
         });
         const payload = {
-          sentBy: state.user._id,
-          sentTo: data[0]._id,
+          messageId: data[0].messageId,
         };
-        getMessageService(payload).then((data: IUserMessage[]) => {
-          dispatch({ type: SET_INITIAL_MESSAGE, payload: data });
+        getMessageService(payload).then((value: IUserMessage[]) => {
+          dispatch({ type: SET_INITIAL_MESSAGE, payload: value });
         });
       }
     });
@@ -43,10 +44,13 @@ const UserList = () => {
     getUsers();
   }, []);
 
-  const onPressUser = (item: IUserProps) => {
+  //any will be removed
+  const onPressUser = (item: IUserProps | any) => {
+    socket.emit("connect_user", {
+      connectionId: item.connection[0].connectionId,
+    });
     const payload = {
-      sentBy: state.user._id,
-      sentTo: item._id,
+      messageId: chatState.user.messageId,
     };
     getMessageService(payload).then((data: IUserMessage[]) => {
       dispatch({ type: SET_INITIAL_MESSAGE, payload: data });

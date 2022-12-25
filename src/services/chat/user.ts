@@ -1,14 +1,13 @@
 import { httpMethod } from "../../api/httpMethodd";
 import { apiRoutes } from "../../constants/apiRoutes";
+import { formatConnectionResponse } from "../util/chat";
 
-export const getUserService = async (id: string) => {
+export const geAllConnectionService = async (id: string) => {
   try {
-    console.log("id", id);
-
     const response = await httpMethod.get(
-      apiRoutes.chat.users.getAll.replace(":id", id)
+      apiRoutes.chat.users.getAllConnections.replace(":id", id)
     );
-    return response.data.data;
+    return formatConnectionResponse(response.data.data);
   } catch (error) {
     throw error;
   }

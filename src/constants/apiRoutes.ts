@@ -2,7 +2,7 @@ export const apiRoutes = {
   auth: { login: "/user/login", register: "/user/register" },
   chat: {
     users: {
-      getAll: "/users/:id",
+      getAllConnections: "/users/connection/:id",
       getUserFriends: "/user/findFriends/:id?keyword=value",
     },
     messages: { getAll: "/message/findAll" },

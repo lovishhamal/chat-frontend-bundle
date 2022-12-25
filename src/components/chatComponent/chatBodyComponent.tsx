@@ -1,8 +1,8 @@
 import { Form, List } from "antd";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { ChatContext } from "../../context/chatContext";
 import { IUserMessage } from "../../interface/components/chat/chatInterface";
-import { io } from "socket.io-client";
+
 import { Input } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import { getCurrentDate } from "../../util/date";
@@ -10,38 +10,35 @@ import { SET_MESSAGE } from "../../constants/actions";
 import { SenderBoxComponent } from "./senderBoxComponent";
 import { ReceiverBoxComponent } from "./receiverBoxComponent";
 import { AuthContext } from "../../context";
-import { CustomModal } from "../../common";
+import { socketIo } from "../../util/socket";
 
 const { TextArea } = Input;
 
 export const ChatBodyComponent = () => {
+  const socket = socketIo();
   const { state, dispatch } = useContext<any>(ChatContext);
   const { state: authState } = useContext<any>(AuthContext);
   const [form] = Form.useForm();
 
-  const socket = useRef(
-    io("http://localhost:5000", {
-      transports: ["websocket", "polling"],
-    })
-  );
-
   useEffect(() => {
-    socket.current.emit("join_room", "dwf_room");
-    socket.current.off("initialMessage").on("initialMessage", (res: any) => {
+    socket.off("initialMessage").on("initialMessage", (res: any) => {
       console.log("message ,recieved", res);
     });
   }, []);
 
   useEffect(() => {
-    socket.current.off("receiveMessage").on("receiveMessage", (res: any) => {
-      dispatch({ type: SET_MESSAGE, payload: res });
-    });
-  }, []);
+    socket
+      .off(state.user.connectionId)
+      .on(state.user.connectionId, (res: any) => {
+        dispatch({ type: SET_MESSAGE, payload: res });
+      });
+  }, [state.connectionId]);
 
   const onClickSend = () => {
-    socket.current.emit("sendMessage", {
+    socket.emit("sendMessage", {
       sentBy: authState.user?._id,
       sentTo: state.user?._id,
+      messageId: state?.user.messageId,
       createdAt: getCurrentDate(),
       displayName: "Lovish Hamal",
       message: form.getFieldValue("message"),

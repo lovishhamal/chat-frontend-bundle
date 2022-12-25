@@ -3,6 +3,8 @@ export interface IUserProps {
   createdAt: string;
   image: Image;
   _id: string;
+  connectionId: string;
+  messageId: string;
 }
 
 interface Image {

@@ -16,6 +16,8 @@ const initialState: IInitialChatProps = {
 const reducer = (state: any = initialState, action: any) => {
   switch (action.type) {
     case SET_USER:
+      const userId = action.payload._id;
+
       return {
         ...state,
         user: action.payload,

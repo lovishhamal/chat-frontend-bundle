@@ -1,6 +1,3 @@
-import { useNavigate } from "react-router-dom";
-import { createBrowserHistory } from "@remix-run/router";
-import { uiRoutes } from "../constants/uiRoutes";
 import { LocalStorage } from "./localStorage";
 
 export const toCapitalize = (str: string) => {
