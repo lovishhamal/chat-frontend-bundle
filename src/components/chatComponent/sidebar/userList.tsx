@@ -13,6 +13,7 @@ import { SET_INITIAL_MESSAGE, SET_USER } from "../../../constants/actions";
 import { AuthContext, ChatContext } from "../../../context";
 import { geAllConnectionService } from "../../../services/chat/user";
 import { socketIo } from "../../../util/socket";
+import { LocalStorage } from "../../../util/localStorage";
 
 const UserList = () => {
   const socket = socketIo();
@@ -45,10 +46,8 @@ const UserList = () => {
   }, []);
 
   //any will be removed
-  const onPressUser = (item: IUserProps | any) => {
-    socket.emit("connect_user", {
-      connectionId: item.connection[0].connectionId,
-    });
+  const onPressUser = async (item: IUserProps | any) => {
+    socket.emit("new-user-add", item._id);
     const payload = {
       messageId: item.messageId,
     };
@@ -56,6 +55,7 @@ const UserList = () => {
     getMessageService(payload).then((data: IUserMessage[]) => {
       dispatch({ type: SET_INITIAL_MESSAGE, payload: data });
     });
+
     dispatch({
       type: SET_USER,
       payload: item,

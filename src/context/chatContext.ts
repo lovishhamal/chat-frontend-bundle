@@ -6,6 +6,7 @@ import {
 import React, { useReducer } from "react";
 import { IInitialChatProps } from "../interface/components/chat/chatInterface";
 import messages from "../json/Messages.json";
+import { LocalStorage } from "../util/localStorage";
 const ChatContext = React.createContext({});
 
 const initialState: IInitialChatProps = {
@@ -16,8 +17,7 @@ const initialState: IInitialChatProps = {
 const reducer = (state: any = initialState, action: any) => {
   switch (action.type) {
     case SET_USER:
-      const userId = action.payload._id;
-
+      LocalStorage.setLocalStorage("item", action.payload);
       return {
         ...state,
         user: action.payload,

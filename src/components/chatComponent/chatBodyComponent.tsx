@@ -1,5 +1,5 @@
 import { Form, List } from "antd";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useMemo, useRef } from "react";
 import { ChatContext } from "../../context/chatContext";
 import { IUserMessage } from "../../interface/components/chat/chatInterface";
 
@@ -11,37 +11,45 @@ import { SenderBoxComponent } from "./senderBoxComponent";
 import { ReceiverBoxComponent } from "./receiverBoxComponent";
 import { AuthContext } from "../../context";
 import { socketIo } from "../../util/socket";
+import { LocalStorage } from "../../util/localStorage";
 
 const { TextArea } = Input;
 
 export const ChatBodyComponent = () => {
   const socket = socketIo();
+  const messagesEndRef = useRef<any>(null);
   const { state, dispatch } = useContext<any>(ChatContext);
   const { state: authState } = useContext<any>(AuthContext);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    socket.off("initialMessage").on("initialMessage", (res: any) => {
+    socket.emit("new-user-add", authState.user?._id);
+    socket.on("initialMessage", (res: any) => {
       console.log("message ,recieved", res);
     });
   }, []);
 
   useEffect(() => {
-    socket
-      .off(state.user.connectionId)
-      .on(state.user.connectionId, (res: any) => {
-        dispatch({ type: SET_MESSAGE, payload: res });
-      });
-  }, [state.user.connectionId]);
+    socket.off("recieve-message").on("recieve-message", async (res: any) => {
+      let item: any = await LocalStorage.getLocalStorage("item");
+      if (item) {
+        item = JSON.parse(item);
+        if (res.connectionId == item.connectionId) {
+          dispatch({ type: SET_MESSAGE, payload: res });
+        }
+      }
+    });
+  }, []);
 
   const onClickSend = () => {
-    socket.emit("sendMessage", {
+    socket.emit("send_message", {
       sentBy: authState.user?._id,
-      sentTo: state.user?._id,
+      sentTo: state.user._id,
       messageId: state?.user.messageId,
       createdAt: getCurrentDate(),
       displayName: "Lovish Hamal",
       message: form.getFieldValue("message"),
+      connectionId: state?.user.connectionId,
     });
 
     form.resetFields();
@@ -60,6 +68,7 @@ export const ChatBodyComponent = () => {
       }}
     >
       <div
+        ref={messagesEndRef}
         style={{
           display: "flex",
           overflow: "auto",
