@@ -1,0 +1,23 @@
+.chatContainer {
+  max-width: 95%;
+  margin: auto;
+  background-color: #fff;
+  min-height: 95vh;
+  width: 100%;
+  border-radius: 10px;
+  display: flex;
+  padding: 10px;
+}
+
+.chatBody {
+  width: 100%;
+  display: flex;
+  background-color: #f4f3f8;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.border {
+  border-left: 1px solid #cccccc;
+  margin: 0px 10px 0px 10px;
+}

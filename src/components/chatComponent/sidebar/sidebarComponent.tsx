@@ -5,10 +5,12 @@ import { AuthContext } from "../../../context";
 import { getUserListService } from "../../../services/chat/user";
 import SearchUserList from "./searchUserList";
 import UserList from "./userList";
-import { LogoutOutlined } from "@ant-design/icons";
+import { LogoutOutlined, SearchOutlined } from "@ant-design/icons";
 import { logout } from "../../../util/common";
 import { useNavigate } from "react-router-dom";
 import { uiRoutes } from "../../../constants/uiRoutes";
+import Styles from "./sidebarComponent.module.css";
+import { Typography } from "antd";
 
 export const SideBarComponent = () => {
   const navigate = useNavigate();
@@ -27,55 +29,30 @@ export const SideBarComponent = () => {
   };
 
   return (
-    <>
-      <div style={{ margin: "-20px 20px 0px 20px" }}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "start",
-          }}
-        >
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              alignContent: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Title>Hi {state?.user.userName ?? ""}</Title>
-            <LogoutOutlined
-              onClick={() =>
-                logout().then(() =>
-                  navigate(uiRoutes.auth.login, { replace: true })
-                )
-              }
-              style={{
-                fontSize: 30,
-                marginTop: 20,
-              }}
-            />
-          </div>
-          <Search
-            placeholder='Email, userName'
+    <div
+      style={{
+        width: 300,
+      }}
+    >
+      <h2>Recent Chats</h2>
+      <div className={Styles.chatListSearch}>
+        <div className={Styles.searchWrap}>
+          <input
+            type='text'
+            placeholder='Search Here'
+            required
             onChange={onChange}
-            enterButton
           />
+          <button className={Styles.searchBtn}>
+            <SearchOutlined />
+          </button>
         </div>
-        <div
-          id='scrollableDiv'
-          style={{
-            height: "90vh",
-            overflow: "auto",
-            padding: "0 16px",
-          }}
-        >
+      </div>
+      <div className={Styles.chatlistItems}>
+        <div className={Styles.chatlistItem}>
           {data?.length ? <SearchUserList data={data} /> : <UserList />}
         </div>
       </div>
-    </>
+    </div>
   );
 };

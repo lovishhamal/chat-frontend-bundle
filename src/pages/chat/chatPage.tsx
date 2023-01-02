@@ -5,6 +5,8 @@ import {
   ChatLayoutComponent,
 } from "../../components/chatComponent";
 import { ChatContext, ChatReducer } from "../../context/chatContext";
+import { MainLayout } from "../../layout";
+import Styles from "./chatPage.module.css";
 
 const { Sider, Content } = Layout;
 
@@ -12,23 +14,15 @@ const ChatPage = () => {
   const { state, dispatch } = ChatReducer();
   return (
     <ChatContext.Provider value={{ state, dispatch }}>
-      <Layout style={{ height: "100vh" }}>
-        <Sider
-          style={{
-            margin: 0,
-            padding: 0,
-            backgroundColor: "white",
-          }}
-          width={400}
-        >
-          <SideBarComponent />
-        </Sider>
-        <Layout style={{ padding: 20 }}>
-          <Content>
+      <MainLayout>
+        <div className={Styles.chatContainer}>
+          <div className={Styles.chatBody}>
+            <SideBarComponent />
+            <div className={Styles.border} />
             <ChatLayoutComponent />
-          </Content>
-        </Layout>
-      </Layout>
+          </div>
+        </div>
+      </MainLayout>
     </ChatContext.Provider>
   );
 };

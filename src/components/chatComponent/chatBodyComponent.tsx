@@ -3,8 +3,7 @@ import { useContext, useEffect, useMemo, useRef } from "react";
 import { ChatContext } from "../../context/chatContext";
 import { IUserMessage } from "../../interface/components/chat/chatInterface";
 
-import { Input } from "antd";
-import { SendOutlined } from "@ant-design/icons";
+import { SendOutlined, PlusOutlined } from "@ant-design/icons";
 import { getCurrentDate } from "../../util/date";
 import { SET_MESSAGE } from "../../constants/actions";
 import { SenderBoxComponent } from "./senderBoxComponent";
@@ -12,12 +11,12 @@ import { ReceiverBoxComponent } from "./receiverBoxComponent";
 import { AuthContext } from "../../context";
 import { socketIo } from "../../util/socket";
 import { LocalStorage } from "../../util/localStorage";
-
-const { TextArea } = Input;
+import Styles from "./chatBodyComponent.module.css";
 
 export const ChatBodyComponent = () => {
   const socket = socketIo();
   const messagesEndRef = useRef<any>(null);
+  const inputRef = useRef<any>(null);
   const { state, dispatch } = useContext<any>(ChatContext);
   const { state: authState } = useContext<any>(AuthContext);
   const [form] = Form.useForm();
@@ -48,35 +47,16 @@ export const ChatBodyComponent = () => {
       messageId: state?.user.messageId,
       createdAt: getCurrentDate(),
       displayName: "Lovish Hamal",
-      message: form.getFieldValue("message"),
+      message: inputRef.current.value,
       connectionId: state?.user.connectionId,
     });
-
-    form.resetFields();
   };
 
   return (
-    <div
-      style={{
-        marginTop: 20,
-        backgroundColor: "white",
-        height: "84vh",
-        padding: 20,
-        flexDirection: "column",
-        display: "flex",
-        justifyContent: "space-between",
-      }}
-    >
-      <div
-        ref={messagesEndRef}
-        style={{
-          display: "flex",
-          overflow: "auto",
-          marginBottom: 10,
-        }}
-      >
+    <div className={Styles.mainChatContent}>
+      <div className={Styles.contentBody}>
         <List
-          style={{ width: "100%" }}
+          style={{ width: "100%", overflow: "scroll" }}
           itemLayout='horizontal'
           dataSource={state.messages}
           renderItem={(item: IUserMessage) => {
@@ -88,27 +68,14 @@ export const ChatBodyComponent = () => {
           }}
         />
       </div>
-      <div
-        style={{
-          flexDirection: "row",
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <Form
-          form={form}
-          style={{ width: "100%", marginRight: 20 }}
-          onFinish={onClickSend}
-        >
-          <Form.Item name='message'>
-            <TextArea
-              rows={4}
-              placeholder='Type a message'
-              onPressEnter={onClickSend}
-            />
-          </Form.Item>
-        </Form>
-        <SendOutlined onClick={onClickSend} />
+      <div className={Styles.sendNewMessage}>
+        <button className='addFiles'>
+          <PlusOutlined />
+        </button>
+        <input type='text' placeholder='Type a message here' ref={inputRef} />
+        <button className='btnSendMsg' id='sendMsgBtn' onClick={onClickSend}>
+          <SendOutlined />
+        </button>
       </div>
     </div>
   );

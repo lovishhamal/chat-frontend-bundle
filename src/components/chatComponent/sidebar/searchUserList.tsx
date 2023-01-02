@@ -7,6 +7,7 @@ import AvatarComponent from "../../../common/avatar";
 import { IUserProps } from "../../../interface/components/chat/chatInterface";
 import { AuthContext } from "../../../context";
 import { postUserConnection } from "../../../services/chat/user";
+import UserListItem from "./userListItem";
 
 const SearchUserList = ({ data }: { data: any }) => {
   const { state } = useContext<any>(AuthContext);
@@ -34,22 +35,12 @@ const SearchUserList = ({ data }: { data: any }) => {
       next={loadMoreData}
       hasMore={data?.length < 0 || false}
       loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
-      endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
       scrollableTarget='scrollableDiv'
     >
       <List
         dataSource={data}
-        renderItem={(item: IUserProps) => (
-          <div style={{ cursor: "pointer" }} onClick={() => onPressUser(item)}>
-            <List.Item>
-              <List.Item.Meta
-                title={<Title level={5}>{item.userName}</Title>}
-                description={
-                  <Paragraph>{`${item.userName} wants to be your friend 😁`}</Paragraph>
-                }
-              />
-            </List.Item>
-          </div>
+        renderItem={(item: IUserProps, index: number) => (
+          <UserListItem index={index} item={item} onPress={onPressUser} />
         )}
       />
     </InfiniteScroll>
