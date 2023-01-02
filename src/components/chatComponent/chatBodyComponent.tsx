@@ -56,6 +56,7 @@ export const ChatBodyComponent = () => {
       message: inputRef.current.value,
       connectionId: state?.user.connectionId,
     });
+    inputRef.current.value = "";
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
