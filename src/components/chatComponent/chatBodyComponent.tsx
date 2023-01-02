@@ -40,6 +40,12 @@ export const ChatBodyComponent = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messagesEndRef.current]);
+
   const onClickSend = () => {
     socket.emit("send_message", {
       sentBy: authState.user?._id,
@@ -50,6 +56,7 @@ export const ChatBodyComponent = () => {
       message: inputRef.current.value,
       connectionId: state?.user.connectionId,
     });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -60,10 +67,15 @@ export const ChatBodyComponent = () => {
           itemLayout='horizontal'
           dataSource={state.messages}
           renderItem={(item: IUserMessage) => {
-            return authState?.user._id === item.sentBy ? (
-              <SenderBoxComponent item={item} />
-            ) : (
-              <ReceiverBoxComponent item={item} />
+            return (
+              <>
+                {authState?.user._id === item.sentBy ? (
+                  <SenderBoxComponent item={item} />
+                ) : (
+                  <ReceiverBoxComponent item={item} />
+                )}
+                <div ref={messagesEndRef} />
+              </>
             );
           }}
         />
