@@ -26,7 +26,16 @@ export const getUserListService = async (id: string, payload: string) => {
   }
 };
 
-export const postUserConnection = async (value: any) => {
+export const createUserConnection = async (value: any) => {
+  try {
+    const response = await httpMethod.post(apiRoutes.user.connection, value);
+    return response.data.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createUserGroup = async (value: any) => {
   try {
     const response = await httpMethod.post(apiRoutes.user.connection, value);
     return response.data.data;

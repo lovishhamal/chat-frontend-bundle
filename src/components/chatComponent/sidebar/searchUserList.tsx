@@ -3,7 +3,7 @@ import { List, Skeleton } from "antd";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { IUserProps } from "../../../interface/components/chat/chatInterface";
 import { AuthContext } from "../../../context";
-import { postUserConnection } from "../../../services/chat/user";
+import { createUserConnection } from "../../../services/chat/user";
 import UserListItem from "./userListItem";
 
 const SearchUserList = ({ data }: { data: any }) => {
@@ -11,7 +11,7 @@ const SearchUserList = ({ data }: { data: any }) => {
   const [loading, setLoading] = useState(false);
 
   const onPressUser = (item: IUserProps) => {
-    postUserConnection({
+    createUserConnection({
       id: state?.user?._id,
       connectionId: { id: item._id },
     }).then((data: any) => {});
