@@ -26,6 +26,10 @@ const AddUserListModal = ({ setOpen }: { setOpen: any }) => {
 
   const onCreate = () => {
     setOpen(false);
+    const payload = {
+      userId: state.user._id,
+      connections_ids: selectedUserId,
+    };
   };
 
   return (
