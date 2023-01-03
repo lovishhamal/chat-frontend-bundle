@@ -8,7 +8,6 @@ import Styles from "./sidebarComponent.module.css";
 
 const AddUserListModal = ({ setOpen }: { setOpen: any }) => {
   const { state } = useContext<any>(AuthContext);
-  const { state: chatState, dispatch } = useContext<any>(ChatContext);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<IUserProps[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<any>([]);
@@ -25,7 +24,9 @@ const AddUserListModal = ({ setOpen }: { setOpen: any }) => {
     getUsers();
   }, []);
 
-  const onCreate = () => {};
+  const onCreate = () => {
+    setOpen(false);
+  };
 
   return (
     <>
@@ -52,7 +53,7 @@ const AddUserListModal = ({ setOpen }: { setOpen: any }) => {
                 margin: "15px 0px 15px 0px",
                 borderRadius: 4,
                 justifyContent: "space-between",
-                backgroundColor: "#f0f0f0",
+                backgroundColor: "#ecefff",
               }}
             >
               <h1>{item.userName}</h1>
@@ -73,12 +74,7 @@ const AddUserListModal = ({ setOpen }: { setOpen: any }) => {
           <p>Cancel</p>
         </div>
         <div style={{ margin: "0px 5px 0px 5px" }} />
-        <div
-          className={Styles.btnCreate}
-          onClick={() => {
-            setOpen(false);
-          }}
-        >
+        <div className={Styles.btnCreate} onClick={onCreate}>
           <p>Create group</p>
         </div>
       </div>
