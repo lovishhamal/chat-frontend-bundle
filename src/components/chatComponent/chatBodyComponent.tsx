@@ -1,9 +1,14 @@
-import { Form, List } from "antd";
-import { useContext, useEffect, useMemo, useRef } from "react";
+import { List } from "antd";
+import { useContext, useEffect, useRef } from "react";
 import { ChatContext } from "../../context/chatContext";
 import { IUserMessage } from "../../interface/components/chat/chatInterface";
 
-import { SendOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  SendOutlined,
+  PlusOutlined,
+  PhoneOutlined,
+  VideoCameraOutlined,
+} from "@ant-design/icons";
 import { getCurrentDate } from "../../util/date";
 import { SET_MESSAGE } from "../../constants/actions";
 import { SenderBoxComponent } from "./senderBoxComponent";
@@ -19,7 +24,6 @@ export const ChatBodyComponent = () => {
   const inputRef = useRef<any>(null);
   const { state, dispatch } = useContext<any>(ChatContext);
   const { state: authState } = useContext<any>(AuthContext);
-  const [form] = Form.useForm();
 
   useEffect(() => {
     socket.emit("new-user-add", authState.user?._id);
@@ -37,6 +41,7 @@ export const ChatBodyComponent = () => {
           dispatch({ type: SET_MESSAGE, payload: res });
         }
       }
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     });
   }, []);
 
@@ -44,7 +49,7 @@ export const ChatBodyComponent = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messagesEndRef.current]);
+  }, [messagesEndRef.current, state]);
 
   const onClickSend = () => {
     socket.emit("send_message", {
@@ -57,38 +62,53 @@ export const ChatBodyComponent = () => {
       connectionId: state?.user.connectionId,
     });
     inputRef.current.value = "";
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <div className={Styles.mainChatContent}>
-      <div className={Styles.contentBody}>
-        <List
-          style={{ width: "100%", overflow: "scroll" }}
-          itemLayout='horizontal'
-          dataSource={state.messages}
-          renderItem={(item: IUserMessage) => {
-            return (
-              <>
-                {authState?.user._id === item.sentBy ? (
-                  <SenderBoxComponent item={item} />
-                ) : (
-                  <ReceiverBoxComponent item={item} />
-                )}
-                <div ref={messagesEndRef} />
-              </>
-            );
-          }}
-        />
+    <div style={{ width: "100%" }}>
+      <div className={Styles.header}>
+        <div>
+          <h1>{state.user.userName}</h1>
+        </div>
+        <div className={Styles.iconWrapper}>
+          <div className={Styles.icon}>
+            <PhoneOutlined />
+          </div>
+          <div className={Styles.iconGap} />
+          <div className={Styles.icon}>
+            <VideoCameraOutlined />
+          </div>
+        </div>
       </div>
-      <div className={Styles.sendNewMessage}>
-        <button className='addFiles'>
-          <PlusOutlined />
-        </button>
-        <input type='text' placeholder='Type a message here' ref={inputRef} />
-        <button className='btnSendMsg' id='sendMsgBtn' onClick={onClickSend}>
-          <SendOutlined />
-        </button>
+      <div className={Styles.mainChatContent}>
+        <div className={Styles.contentBody}>
+          <List
+            style={{ width: "100%", overflow: "scroll" }}
+            itemLayout='horizontal'
+            dataSource={state.messages}
+            renderItem={(item: IUserMessage) => {
+              return (
+                <>
+                  {authState?.user._id === item.sentBy ? (
+                    <SenderBoxComponent item={item} />
+                  ) : (
+                    <ReceiverBoxComponent item={item} />
+                  )}
+                  <div ref={messagesEndRef} />
+                </>
+              );
+            }}
+          />
+        </div>
+        <div className={Styles.sendNewMessage}>
+          <button className='addFiles'>
+            <PlusOutlined />
+          </button>
+          <input type='text' placeholder='Type a message here' ref={inputRef} />
+          <button className='btnSendMsg' id='sendMsgBtn' onClick={onClickSend}>
+            <SendOutlined />
+          </button>
+        </div>
       </div>
     </div>
   );

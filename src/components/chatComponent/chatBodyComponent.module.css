@@ -3,10 +3,11 @@
   padding: 20px 40px;
   border-right: 1px solid #ebe7fb;
   height: 70vh;
+  padding-left: 0px;
 }
 
 .contentBody {
-  height: calc(100% - (-90px));
+  height: calc(100% - (-40px));
   overflow: auto;
 }
 
@@ -103,4 +104,32 @@
 
 .chatMessage {
   user-select: none;
+}
+
+.header {
+  padding: 0px;
+  margin: 0px;
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 0px 10px 0px 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.icon {
+  background-color: #ecefff;
+  padding: 10px;
+  border-radius: 100px;
+  color: #4665ff;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconGap {
+  margin: 0px 5px 0px 5px;
 }
