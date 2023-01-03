@@ -9,19 +9,25 @@ import React, {
 import AutoCompleteSearch from "../textSearch";
 
 const CustomModal = ({
+  title = "Modal",
+  footer = true,
   open,
   setOpen,
   children,
 }: {
+  title?: string;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   children: React.ReactNode;
+  footer?: boolean;
 }) => {
   return (
     <Modal
-      title='Modal'
+      title={title}
+      cancelButtonProps={{ style: { display: footer ? "" : "none" } }}
+      okButtonProps={{ style: { display: footer ? "" : "none" } }}
       open={open}
-      okText='Ok'
+      okText='Create'
       cancelText='Cancel'
       onOk={() => setOpen(false)}
       onCancel={() => setOpen(false)}

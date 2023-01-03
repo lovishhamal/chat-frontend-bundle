@@ -13,7 +13,6 @@ import { socketIo } from "../../../util/socket";
 import UserListItem from "./userListItem";
 
 const UserList = () => {
-  const socket = socketIo();
   const { state } = useContext<any>(AuthContext);
   const { state: chatState, dispatch } = useContext<any>(ChatContext);
 

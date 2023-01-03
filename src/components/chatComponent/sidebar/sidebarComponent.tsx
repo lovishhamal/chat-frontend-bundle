@@ -1,19 +1,17 @@
-import Search from "antd/es/input/Search";
-import Title from "antd/es/typography/Title";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../context";
 import { getUserListService } from "../../../services/chat/user";
 import SearchUserList from "./searchUserList";
 import UserList from "./userList";
-import { LogoutOutlined, SearchOutlined } from "@ant-design/icons";
-import { logout } from "../../../util/common";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { uiRoutes } from "../../../constants/uiRoutes";
 import Styles from "./sidebarComponent.module.css";
-import { Typography } from "antd";
+import { CustomModal } from "../../../common";
+import AddUserListModal from "./addUserListModal";
 
 export const SideBarComponent = () => {
   const navigate = useNavigate();
+  const [open, setOpen] = useState<boolean>(false);
   const [data, setData] = useState<any>([]);
   const { state } = useContext<any>(AuthContext);
 
@@ -29,30 +27,42 @@ export const SideBarComponent = () => {
   };
 
   return (
-    <div
-      style={{
-        width: 300,
-      }}
-    >
-      <h2>Recent Chats</h2>
-      <div className={Styles.chatListSearch}>
-        <div className={Styles.searchWrap}>
-          <input
-            type='text'
-            placeholder='Search Here'
-            required
-            onChange={onChange}
-          />
-          <button className={Styles.searchBtn}>
-            <SearchOutlined />
-          </button>
+    <>
+      <CustomModal open={open} setOpen={setOpen} title='Friends' footer={false}>
+        <AddUserListModal setOpen={setOpen} />
+      </CustomModal>
+      <div
+        style={{
+          width: 300,
+        }}
+      >
+        <div className={Styles.btn} onClick={() => setOpen(true)}>
+          <div>
+            <PlusOutlined />
+          </div>
+          <div style={{ margin: "0px 2px 0px 2px" }} />
+          <p>Create group</p>
+        </div>
+        <h2>Recent Chats</h2>
+        <div className={Styles.chatListSearch}>
+          <div className={Styles.searchWrap}>
+            <input
+              type='text'
+              placeholder='Search Here'
+              required
+              onChange={onChange}
+            />
+            <button className={Styles.searchBtn}>
+              <SearchOutlined />
+            </button>
+          </div>
+        </div>
+        <div className={Styles.chatlistItems}>
+          <div className={Styles.chatlistItem}>
+            {data?.length ? <SearchUserList data={data} /> : <UserList />}
+          </div>
         </div>
       </div>
-      <div className={Styles.chatlistItems}>
-        <div className={Styles.chatlistItem}>
-          {data?.length ? <SearchUserList data={data} /> : <UserList />}
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
