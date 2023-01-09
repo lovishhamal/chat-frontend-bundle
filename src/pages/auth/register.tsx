@@ -1,15 +1,12 @@
-import { LockOutlined, UserOutlined, InboxOutlined } from "@ant-design/icons";
-import { Button, Card, Checkbox, Form, Input, Typography, Upload } from "antd";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { Button, Card, Form, Input, Upload } from "antd";
 import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
-import FormItem from "antd/es/form/FormItem";
 import { Link, useNavigate } from "react-router-dom";
 import { uiRoutes } from "../../constants/uiRoutes";
 import ImgCrop from "antd-img-crop";
 import { useState } from "react";
 import { registerService } from "../../services/auth";
 import { MainLayout } from "../../layout";
-
-const { Title } = Typography;
 
 const RegisterPage = () => {
   const navigate = useNavigate();

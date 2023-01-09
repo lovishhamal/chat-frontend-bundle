@@ -28,7 +28,12 @@ export const SideBarComponent = () => {
 
   return (
     <>
-      <CustomModal open={open} setOpen={setOpen} title='Friends' footer={false}>
+      <CustomModal
+        open={open}
+        setOpen={setOpen}
+        title='Create a group'
+        footer={false}
+      >
         <AddUserListModal setOpen={setOpen} />
       </CustomModal>
       <div

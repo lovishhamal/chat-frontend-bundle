@@ -1,12 +1,17 @@
 import { List } from "antd";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext, ChatContext } from "../../../context";
 import { IUserProps } from "../../../interface/components/chat/chatInterface";
-import { geAllConnectionService } from "../../../services/chat/user";
+import {
+  createUserGroupService,
+  geAllConnectionService,
+} from "../../../services/chat/user";
 import { CheckCircleOutlined } from "@ant-design/icons";
-import Styles from "./sidebarComponent.module.css";
+import Styles from "./addUserModal.module.css";
+import { ConnectionType } from "../../../enums/common";
 
 const AddUserListModal = ({ setOpen }: { setOpen: any }) => {
+  const inputRef = useRef<any>(null);
   const { state } = useContext<any>(AuthContext);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<IUserProps[]>([]);
@@ -28,12 +33,22 @@ const AddUserListModal = ({ setOpen }: { setOpen: any }) => {
     setOpen(false);
     const payload = {
       userId: state.user._id,
-      connections_ids: selectedUserId,
+      connectionsIds: selectedUserId,
+      groupName: inputRef.current.value,
+      connectionType: ConnectionType.GROUP,
     };
+    createUserGroupService(payload)
+      .then((data) => {})
+      .catch((err) => {});
   };
 
   return (
     <>
+      <h1>Group name</h1>
+      <div className={Styles.btn}>
+        <input type='text' placeholder='Enter group name' ref={inputRef} />
+      </div>
+      <h1>Friends</h1>
       <List
         itemLayout='horizontal'
         dataSource={users}

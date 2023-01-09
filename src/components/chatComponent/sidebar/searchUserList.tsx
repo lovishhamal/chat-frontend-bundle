@@ -3,17 +3,19 @@ import { List, Skeleton } from "antd";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { IUserProps } from "../../../interface/components/chat/chatInterface";
 import { AuthContext } from "../../../context";
-import { createUserConnection } from "../../../services/chat/user";
+import { createUserConnectionService } from "../../../services/chat/user";
 import UserListItem from "./userListItem";
+import { ConnectionType } from "../../../enums/common";
 
 const SearchUserList = ({ data }: { data: any }) => {
   const { state } = useContext<any>(AuthContext);
   const [loading, setLoading] = useState(false);
 
   const onPressUser = (item: IUserProps) => {
-    createUserConnection({
+    createUserConnectionService({
       id: state?.user?._id,
       connectionId: { id: item._id },
+      connectionType: ConnectionType.INDIVIDDUAL,
     }).then((data: any) => {});
   };
 

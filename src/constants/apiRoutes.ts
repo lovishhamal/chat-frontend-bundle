@@ -9,5 +9,6 @@ export const apiRoutes = {
   },
   user: {
     connection: "/user/connection",
+    groupConnection: "/user/groupConnection",
   },
 };

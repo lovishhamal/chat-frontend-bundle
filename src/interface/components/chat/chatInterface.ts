@@ -25,4 +25,5 @@ export interface IUserMessage {
   createdAt: string;
   sender: boolean;
   message: string;
+  image: Image;
 }

@@ -19,6 +19,7 @@ export const ReceiverBoxComponent = ({ item }: { item: IUserMessage }) => {
       </div>
       <div className={Styles.receiverBox}>
         <div className={Styles.chatMessage}>{item.message}</div>
+        {item?.image.data && <img src={item.image.data} />}
         <p style={{ alignSelf: "start", marginLeft: 10 }}>
           {formatDate(item.createdAt, "PPP, p")}
         </p>

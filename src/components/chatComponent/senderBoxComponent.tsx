@@ -17,6 +17,7 @@ export const SenderBoxComponent = ({ item }: { item: IUserMessage }) => {
     >
       <div className={Styles.senderBox}>
         <div className={Styles.chatMessage}>{item.message}</div>
+        {item?.image.data && <img src={item.image.data} />}
         <p style={{ alignSelf: "flex-end", marginRight: 10 }}>
           {formatDate(item.createdAt, "PPP")}
         </p>

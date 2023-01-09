@@ -9,7 +9,6 @@ import { getMessageService } from "../../../services/chat/message";
 import { SET_INITIAL_MESSAGE, SET_USER } from "../../../constants/actions";
 import { AuthContext, ChatContext } from "../../../context";
 import { geAllConnectionService } from "../../../services/chat/user";
-import { socketIo } from "../../../util/socket";
 import UserListItem from "./userListItem";
 
 const UserList = () => {
