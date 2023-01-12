@@ -3,7 +3,7 @@ import { List, Skeleton } from "antd";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { IUserProps } from "../../../interface/components/chat/chatInterface";
 import { AuthContext } from "../../../context";
-import { createUserConnectionService } from "../../../services/chat/user";
+import { createUserConnectionService } from "../../../services/communication/chat/user";
 import UserListItem from "./userListItem";
 import { ConnectionType } from "../../../enums/common";
 

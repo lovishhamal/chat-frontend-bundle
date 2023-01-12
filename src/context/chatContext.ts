@@ -5,8 +5,8 @@ import {
 } from "../constants/actions";
 import React, { useReducer } from "react";
 import { IInitialChatProps } from "../interface/components/chat/chatInterface";
-import messages from "../json/Messages.json";
 import { LocalStorage } from "../util/localStorage";
+
 const ChatContext = React.createContext({});
 
 const initialState: IInitialChatProps = {

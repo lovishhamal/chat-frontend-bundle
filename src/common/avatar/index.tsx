@@ -1,5 +1,3 @@
-import { Avatar } from "antd";
-import React from "react";
 import Styles from "./avatar.module.css";
 
 const AvatarComponent = ({

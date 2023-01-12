@@ -5,10 +5,10 @@ import {
   IUserMessage,
   IUserProps,
 } from "../../../interface/components/chat/chatInterface";
-import { getMessageService } from "../../../services/chat/message";
+import { getMessageService } from "../../../services/communication/chat/message";
 import { SET_INITIAL_MESSAGE, SET_USER } from "../../../constants/actions";
 import { AuthContext, ChatContext } from "../../../context";
-import { geAllConnectionService } from "../../../services/chat/user";
+import { geAllConnectionService } from "../../../services/communication/chat/user";
 import UserListItem from "./userListItem";
 
 const UserList = () => {

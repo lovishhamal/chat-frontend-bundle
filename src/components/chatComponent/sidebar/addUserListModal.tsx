@@ -5,7 +5,7 @@ import { IUserProps } from "../../../interface/components/chat/chatInterface";
 import {
   createUserGroupService,
   geAllConnectionService,
-} from "../../../services/chat/user";
+} from "../../../services/communication/chat/user";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import Styles from "./addUserModal.module.css";
 import { ConnectionType } from "../../../enums/common";
@@ -37,6 +37,7 @@ const AddUserListModal = ({ setOpen }: { setOpen: any }) => {
       groupName: inputRef.current.value,
       connectionType: ConnectionType.GROUP,
     };
+
     createUserGroupService(payload)
       .then((data) => {})
       .catch((err) => {});

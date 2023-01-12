@@ -1,4 +1,4 @@
-import { List } from "antd";
+import { Divider, List } from "antd";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ChatContext } from "../../context/chatContext";
 import { IUserMessage } from "../../interface/components/chat/chatInterface";
@@ -8,19 +8,22 @@ import {
   PlusOutlined,
   PhoneOutlined,
   VideoCameraOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { getCurrentDate } from "../../util/date";
 import { SET_MESSAGE } from "../../constants/actions";
 import { SenderBoxComponent } from "./senderBoxComponent";
 import { ReceiverBoxComponent } from "./receiverBoxComponent";
 import { AuthContext } from "../../context";
-import { socketIo } from "../../util/socket";
 import { LocalStorage } from "../../util/localStorage";
 import Styles from "./chatBodyComponent.module.css";
 import { UploadPhoto } from "../../common";
+import AvatarComponent from "../../common/avatar";
+import { VideoContext } from "../../context/videoContext";
 
 export const ChatBodyComponent = () => {
-  const socket = socketIo();
+  const { socket, callUser } = useContext<any>(VideoContext);
+
   const messagesEndRef = useRef<any>(null);
   const inputRef = useRef<any>(null);
   const imageRef = useRef<any>(null);
@@ -80,15 +83,26 @@ export const ChatBodyComponent = () => {
   return (
     <div style={{ width: "100%" }}>
       <div className={Styles.header}>
-        <div>
-          <h1>{state.user.userName}</h1>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <AvatarComponent image={state.user?.image?.data} />
+          <h1 style={{ textTransform: "capitalize" }}>{state.user.userName}</h1>
         </div>
         <div className={Styles.iconWrapper}>
           <div className={Styles.icon}>
             <PhoneOutlined />
           </div>
           <div className={Styles.iconGap} />
-          <div className={Styles.icon}>
+          <div
+            className={Styles.icon}
+            onClick={() => {
+              const receiver = {
+                id: state.user._id,
+                name: state.user.userName,
+                image: state.user.image.data,
+              };
+              callUser(receiver);
+            }}
+          >
             <VideoCameraOutlined />
           </div>
         </div>
@@ -113,19 +127,37 @@ export const ChatBodyComponent = () => {
             }}
           />
         </div>
-        {showUploadFile && (
-          <UploadPhoto
-            handleChange={(item: any) => (imageRef.current = item)}
-          />
-        )}
-        <div className={Styles.sendNewMessage}>
-          <button className='addFiles' onClick={() => setShowUploadFile(true)}>
-            <PlusOutlined />
-          </button>
-          <input type='text' placeholder='Type a message here' ref={inputRef} />
-          <button className='btnSendMsg' id='sendMsgBtn' onClick={onClickSend}>
-            <SendOutlined />
-          </button>
+        <div className={Styles.messageInputWrapper}>
+          {showUploadFile && (
+            <div>
+              {/* <UploadPhoto
+                handleChange={(item: any) => (imageRef.current = item)}
+              />
+              <Divider /> */}
+              <h1>Hello</h1>
+              <Divider style={{ backgroundColor: "red" }} />
+            </div>
+          )}
+          <div className={Styles.sendNewMessage}>
+            <button
+              className='addFiles'
+              onClick={() => setShowUploadFile(!showUploadFile)}
+            >
+              {showUploadFile ? <CloseOutlined /> : <PlusOutlined />}
+            </button>
+            <input
+              type='text'
+              placeholder='Type a message here'
+              ref={inputRef}
+            />
+            <button
+              className='btnSendMsg'
+              id='sendMsgBtn'
+              onClick={onClickSend}
+            >
+              <SendOutlined />
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -20,33 +20,23 @@ const UploadPhoto = ({
   };
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: "60%",
-        left: "40%",
-        justifySelf: "center",
-        alignSelf: "center",
-      }}
+    <Dragger
+      action='https://www.mocky.io/v2/5cc8019d300000980a055e76'
+      listType='picture-card'
+      fileList={fileList}
+      onChange={onChange}
     >
-      <Dragger
-        action='https://www.mocky.io/v2/5cc8019d300000980a055e76'
-        listType='picture-card'
-        fileList={fileList}
-        onChange={onChange}
-      >
-        <p className='ant-upload-drag-icon'>
-          <InboxOutlined />
-        </p>
-        <p className='ant-upload-text'>
-          Click or drag file to this area to upload
-        </p>
-        <p className='ant-upload-hint'>
-          Support for a single or bulk upload. Strictly prohibit from uploading
-          company data or other band files
-        </p>
-      </Dragger>
-    </div>
+      <p className='ant-upload-drag-icon'>
+        <InboxOutlined />
+      </p>
+      <p className='ant-upload-text'>
+        Click or drag file to this area to upload
+      </p>
+      <p className='ant-upload-hint'>
+        Support for a single or bulk upload. Strictly prohibit from uploading
+        company data or other band files
+      </p>
+    </Dragger>
   );
 };
 

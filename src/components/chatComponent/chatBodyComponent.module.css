@@ -15,8 +15,13 @@
   padding-top: 30px;
 }
 
-.sendNewMessage {
+.messageInputWrapper {
   background-color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.sendNewMessage {
   display: flex;
   justify-content: space-between;
   border-radius: 8px;
@@ -85,8 +90,8 @@
 }
 
 .senderBox {
-  background-color: #4462ff;
-  color: #fff;
+  background-color: #acfcac;
+  color: #000000;
   padding: 15px;
   border-radius: 10px 10px 0 10px;
   max-width: 50%;
@@ -95,7 +100,7 @@
 
 .receiverBox {
   background-color: #fff;
-  color: #000;
+  color: #000000;
   padding: 15px;
   border-radius: 10px 10px 10px 0px;
   max-width: 50%;
@@ -113,7 +118,7 @@
   justify-content: space-between;
   background-color: #fff;
   padding: 0px 10px 0px 10px;
-  border-radius: 10px;
+  border-radius: 5px;
   margin-bottom: 10px;
 }
 
@@ -122,6 +127,7 @@
   padding: 10px;
   border-radius: 100px;
   color: #4665ff;
+  cursor: pointer;
 }
 
 .iconWrapper {
@@ -132,4 +138,17 @@
 
 .iconGap {
   margin: 0px 5px 0px 5px;
+}
+
+.senderContainer {
+  display: flex;
+  margin-bottom: 50px;
+  align-items: flex-end;
+  justify-content: flex-end;
+  animation-delay: 0.8s;
+}
+
+.doubleCheck {
+  display: flex;
+  justify-content: flex-end;
 }

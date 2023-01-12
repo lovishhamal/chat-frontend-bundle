@@ -7,6 +7,7 @@ import {
 import { ChatContext, ChatReducer } from "../../context/chatContext";
 import { MainLayout } from "../../layout";
 import Styles from "./chatPage.module.css";
+import VideoContextProvider from "../../context/videoContext";
 
 const { Sider, Content } = Layout;
 

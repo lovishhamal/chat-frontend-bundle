@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../context";
-import { getUserListService } from "../../../services/chat/user";
+import { getUserListService } from "../../../services/communication/chat/user";
 import SearchUserList from "./searchUserList";
 import UserList from "./userList";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";

@@ -14,12 +14,16 @@ const CustomModal = ({
   open,
   setOpen,
   children,
+  okText = "Create",
+  cancelText = "Cancel",
 }: {
   title?: string;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   children: React.ReactNode;
   footer?: boolean;
+  okText?: string;
+  cancelText?: string;
 }) => {
   return (
     <Modal
@@ -27,8 +31,8 @@ const CustomModal = ({
       cancelButtonProps={{ style: { display: footer ? "" : "none" } }}
       okButtonProps={{ style: { display: footer ? "" : "none" } }}
       open={open}
-      okText='Create'
-      cancelText='Cancel'
+      okText={okText}
+      cancelText={cancelText}
       onOk={() => setOpen(false)}
       onCancel={() => setOpen(false)}
       destroyOnClose

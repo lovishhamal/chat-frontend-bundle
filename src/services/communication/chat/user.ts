@@ -1,6 +1,6 @@
-import { httpMethod } from "../../api/httpMethodd";
-import { apiRoutes } from "../../constants/apiRoutes";
-import { formatConnectionResponse } from "../util/chat";
+import { httpMethod } from "../../../api/httpMethodd";
+import { apiRoutes } from "../../../constants/apiRoutes";
+import { formatConnectionResponse } from "../../util/chat";
 
 export const geAllConnectionService = async (id: string) => {
   try {
