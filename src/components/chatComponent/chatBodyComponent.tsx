@@ -101,9 +101,10 @@ export const ChatBodyComponent = () => {
             className={Styles.icon}
             onClick={() => {
               const receiver = {
-                id: state.user._id,
-                name: state.user.userName,
-                image: state.user.image.data,
+                receiver_id: state.user._id,
+                caller_id: authState.user._id,
+                name: authState.user.userName,
+                image: authState.user.image.data,
               };
               callUser(receiver);
             }}

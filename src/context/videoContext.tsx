@@ -16,7 +16,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   useEffect(() => {
     userRef.current = state.user;
     socket.off("get_call").on("get_call", (data: any) => {
-      if (state.user._id === data.id) {
+      if (state.user._id !== data.caller_id) {
         myRef?.current.play();
         userRef.current = data;
         setOpen(true);
