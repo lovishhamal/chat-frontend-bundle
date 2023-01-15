@@ -1,17 +1,10 @@
 export interface IUserProps {
   userName: string;
   createdAt: string;
-  image: Image;
+  image: IImage;
   _id: string;
   connectionId: string;
   messageId: string;
-}
-
-interface Image {
-  name?: string;
-  size?: number;
-  data?: string;
-  type?: string;
 }
 
 export interface IInitialChatProps {
@@ -20,10 +13,26 @@ export interface IInitialChatProps {
 }
 
 export interface IUserMessage {
-  sentBy: string;
+  _id: string;
+  messageId: string;
+  connectionId: string;
+  createdAt: Date;
   displayName: string;
-  createdAt: string;
-  sender: boolean;
-  message: string;
-  image: Image;
+  messages: IMessage[];
+  sentBy: string;
+  sentTo: string;
+}
+
+export interface IMessage {
+  sentBy: string;
+  text: string;
+  updatedAt: string;
+  image?: IImage;
+}
+
+interface IImage {
+  name: string;
+  size: number;
+  data: string;
+  type: string;
 }

@@ -1,7 +1,7 @@
 import { Divider, List } from "antd";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ChatContext } from "../../context/chatContext";
-import { IUserMessage } from "../../interface/components/chat/chatInterface";
+import { IMessage } from "../../interface/components/chat/chatInterface";
 
 import {
   SendOutlined,
@@ -58,25 +58,30 @@ export const ChatBodyComponent = () => {
   }, [messagesEndRef.current, state]);
 
   const onClickSend = () => {
-    let image = {};
+    let message: any = {
+      connectionId: state?.user.connectionId,
+      sentBy: authState.user?._id,
+      sentTo: state.user._id,
+      text: inputRef.current.value,
+      updatedAt: getCurrentDate(),
+    };
     if (imageRef.current) {
-      image = {
+      const image = {
         name: imageRef.current.name,
         size: imageRef.current.size,
         data: imageRef.current.thumbUrl,
         type: imageRef.current.type,
       };
+      message = { ...message, image };
     }
-    socket.emit("send_message", {
-      sentBy: authState.user?._id,
-      sentTo: state.user._id,
+
+    const body = {
       messageId: state?.user.messageId,
       createdAt: getCurrentDate(),
-      displayName: "Lovish Hamal",
-      message: inputRef.current.value,
       connectionId: state?.user.connectionId,
-      image,
-    });
+      message,
+    };
+    socket.emit("send_message", body);
     inputRef.current.value = "";
   };
 
@@ -113,7 +118,7 @@ export const ChatBodyComponent = () => {
             style={{ width: "100%", overflow: "scroll" }}
             itemLayout='horizontal'
             dataSource={state.messages}
-            renderItem={(item: IUserMessage) => {
+            renderItem={(item: IMessage) => {
               return (
                 <>
                   {authState?.user._id === item.sentBy ? (
@@ -130,10 +135,10 @@ export const ChatBodyComponent = () => {
         <div className={Styles.messageInputWrapper}>
           {showUploadFile && (
             <div>
-              {/* <UploadPhoto
+              <UploadPhoto
                 handleChange={(item: any) => (imageRef.current = item)}
               />
-              <Divider /> */}
+              <Divider />
               <h1>Hello</h1>
               <Divider style={{ backgroundColor: "red" }} />
             </div>

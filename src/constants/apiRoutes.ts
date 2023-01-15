@@ -5,7 +5,7 @@ export const apiRoutes = {
       getAllConnections: "/users/connection/:id",
       getUserFriends: "/user/findFriends/:id?keyword=value",
     },
-    messages: { getAll: "/message/findAll" },
+    messages: { getAll: "/message/find" },
   },
   user: {
     connection: "/user/connection",

@@ -29,8 +29,10 @@ const UserList = () => {
         const payload = {
           messageId: data[0].messageId,
         };
-        getMessageService(payload).then((value: IUserMessage[]) => {
-          dispatch({ type: SET_INITIAL_MESSAGE, payload: value });
+        getMessageService(payload).then((data: IUserMessage) => {
+          if (data) {
+            dispatch({ type: SET_INITIAL_MESSAGE, payload: data });
+          }
         });
       }
     });

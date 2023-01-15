@@ -1,6 +1,7 @@
 import { format, compareAsc } from "date-fns";
 
-export const formatDate = (date: string, dateFormat = "MM/dd/yyyy") => {
+export const formatDate = (date?: string, dateFormat = "MM/dd/yyyy") => {
+  if (!date) return "-";
   return format(new Date(date), dateFormat);
 };
 

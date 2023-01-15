@@ -22,11 +22,10 @@ const reducer = (state: any = initialState, action: any) => {
         ...state,
         user: action.payload,
       };
-
     case SET_INITIAL_MESSAGE:
       return {
         ...state,
-        messages: action.payload,
+        messages: action.payload?.messages ?? [],
       };
     case SET_MESSAGE:
       return {
