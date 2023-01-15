@@ -114,7 +114,11 @@ export const ChatBodyComponent = () => {
         </div>
       </div>
       <div className={Styles.mainChatContent}>
-        <div className={Styles.contentBody}>
+        <div
+          className={
+            showUploadFile ? Styles.contentBody : Styles.contentBodyOverflow
+          }
+        >
           <List
             style={{ width: "100%", overflow: "scroll" }}
             itemLayout='horizontal'
@@ -140,8 +144,6 @@ export const ChatBodyComponent = () => {
                 handleChange={(item: any) => (imageRef.current = item)}
               />
               <Divider />
-              <h1>Hello</h1>
-              <Divider style={{ backgroundColor: "red" }} />
             </div>
           )}
           <div className={Styles.sendNewMessage}>

@@ -7,6 +7,11 @@
 }
 
 .contentBody {
+  height: calc(100% - (147px));
+  overflow: auto;
+}
+
+.contentBodyOverflow {
   height: calc(100% - (-40px));
   overflow: auto;
 }
@@ -19,7 +24,12 @@
   background-color: #fff;
   display: flex;
   flex-direction: column;
+  z-index: 100;
 }
+
+/* .messageInputWrapper .overflow {
+  margin-top: -300px;
+} */
 
 .sendNewMessage {
   display: flex;
