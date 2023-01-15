@@ -16,6 +16,8 @@ const CustomModal = ({
   children,
   okText = "Create",
   cancelText = "Cancel",
+  onOkPress = () => {},
+  onCancelPress = () => {},
 }: {
   title?: string;
   open: boolean;
@@ -24,6 +26,8 @@ const CustomModal = ({
   footer?: boolean;
   okText?: string;
   cancelText?: string;
+  onOkPress?: () => void;
+  onCancelPress?: () => void;
 }) => {
   return (
     <Modal
@@ -33,8 +37,14 @@ const CustomModal = ({
       open={open}
       okText={okText}
       cancelText={cancelText}
-      onOk={() => setOpen(false)}
-      onCancel={() => setOpen(false)}
+      onOk={() => {
+        setOpen(false);
+        onOkPress();
+      }}
+      onCancel={() => {
+        setOpen(false);
+        onCancelPress();
+      }}
       destroyOnClose
     >
       {children}
