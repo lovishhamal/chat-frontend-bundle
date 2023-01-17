@@ -35,15 +35,20 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     userRef.current = state.user;
 
     socket
-      .off("callUser")
-      .on("callUser", ({ from, name: callerName, signal, data, caller_id }) => {
-        setCall(signal);
-        if (state.user._id !== caller_id.caller_id) {
-          myRef?.current.play();
-          userRef.current = data;
-          setOpen(true);
+      .off("call_user")
+      .on(
+        "call_user",
+        ({ from, name: callerName, signal, data, caller_id }) => {
+          console.log("ccc");
+
+          setCall(signal);
+          if (state.user._id !== caller_id.caller_id) {
+            myRef?.current.play();
+            userRef.current = data;
+            setOpen(true);
+          }
         }
-      });
+      );
   }, []);
 
   const answerCall = () => {
@@ -52,7 +57,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     const peer = new Peer({ initiator: false, trickle: false, stream });
 
     peer.on("signal", (data) => {
-      socket.emit("answerCall", { signal: data, to: call.from });
+      socket.emit("answer_call", { signal: data, to: call.from });
     });
 
     peer.on("stream", (currentStream) => {
@@ -67,7 +72,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
 
     peer.on("signal", (data) => {
-      socket.emit("callUser", {
+      socket.emit("call_user", {
         userToCall: id,
         signalData: data,
         from: "me",
@@ -80,7 +85,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       userVideo.current.srcObject = currentStream;
     });
 
-    socket.on("callAccepted", (signal) => {
+    socket.on("call_accepted", (signal) => {
       setCallAccepted(true);
 
       peer.signal(signal);
