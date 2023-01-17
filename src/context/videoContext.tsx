@@ -11,84 +11,69 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const { state } = useContext<any>(AuthContext);
   const myRef = useRef<any>(null);
   const userRef = useRef<any>(null);
-  const myVideo = useRef<any>(null);
-  const userVideo = useRef<any>(null);
+  const myVideoRef = useRef<any>(null);
+  const signalRef = useRef<any>(null);
+  const userVideoRef = useRef<any>(null);
   const connectionRef = useRef<any>(null);
   const [open, setOpen] = useState(false);
   const [stream, setStream] = useState<any>(null);
-  const [call, setCall] = useState<any>(null);
   const [name, setName] = useState<any>(null);
-  const [callAccepted, setCallAccepted] = useState<any>(null);
 
   useEffect(() => {
-    if (myVideo.current) {
+    if (myVideoRef.current) {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((currentStream) => {
           setStream(currentStream);
-          myVideo.current.srcObject = currentStream;
+          myVideoRef.current.srcObject = currentStream;
         });
     }
-  }, [myVideo.current]);
+  }, [myVideoRef.current]);
 
   useEffect(() => {
     userRef.current = state.user;
-
-    socket
-      .off("call_user")
-      .on(
-        "call_user",
-        ({ from, name: callerName, signal, data, caller_id }) => {
-          console.log("ccc");
-
-          setCall(signal);
-          if (state.user._id !== caller_id.caller_id) {
-            myRef?.current.play();
-            userRef.current = data;
-            setOpen(true);
-          }
-        }
-      );
+    socket.off("call_user").on("call_user", ({ signal, data }) => {
+      signalRef.current = signal;
+      if (state.user._id !== data.caller_id) {
+        myRef?.current.play();
+        userRef.current = data;
+        setOpen(true);
+      }
+    });
   }, []);
 
   const answerCall = () => {
-    setCallAccepted(true);
     pauseAudio();
     const peer = new Peer({ initiator: false, trickle: false, stream });
 
-    peer.on("signal", (data) => {
-      socket.emit("answer_call", { signal: data, to: call.from });
+    peer.on("signal", (signalData) => {
+      socket.emit("answer_call", { signalData });
     });
 
     peer.on("stream", (currentStream) => {
-      userVideo.current.srcObject = currentStream;
+      userVideoRef.current.srcObject = currentStream;
     });
 
-    peer.signal(call);
+    peer.signal(signalRef.current);
     connectionRef.current = peer;
   };
 
-  const callUser = (id: any) => {
+  const callUser = (data: any) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
 
-    peer.on("signal", (data) => {
+    peer.on("signal", (signalData) => {
       socket.emit("call_user", {
-        userToCall: id,
-        signalData: data,
-        from: "me",
-        name,
-        caller_id: id,
+        signalData,
+        data,
       });
     });
 
     peer.on("stream", (currentStream) => {
-      userVideo.current.srcObject = currentStream;
+      userVideoRef.current.srcObject = currentStream;
     });
 
-    socket.on("call_accepted", (signal) => {
-      setCallAccepted(true);
-
-      peer.signal(signal);
+    socket.on("call_accepted", (signalData) => {
+      peer.signal(signalData);
     });
 
     connectionRef.current = peer;
@@ -102,10 +87,10 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
       <div style={{ display: "flex" }}>
         <div style={{ border: "1px solid red" }}>
-          <video playsInline muted autoPlay ref={myVideo}></video>
+          <video playsInline muted autoPlay ref={myVideoRef}></video>
         </div>
         <div style={{ border: "1px solid red" }}>
-          <video playsInline muted autoPlay ref={userVideo}></video>
+          <video playsInline muted autoPlay ref={userVideoRef}></video>
         </div>
       </div>
 
