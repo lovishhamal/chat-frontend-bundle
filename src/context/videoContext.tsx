@@ -4,6 +4,7 @@ import { socketIo } from "../util/socket";
 import { AuthContext } from "./authContext";
 import Peer from "simple-peer";
 import Video from "../components/context/video";
+import { CloseOutlined } from "@ant-design/icons";
 
 export const VideoContext = createContext({});
 const socket = socketIo();
@@ -87,17 +88,28 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       {callInitiated ? (
         <div
           style={{
-            width: "100vw",
-            height: "100vh",
             display: "flex",
-            justifyContent: "center",
+            flexWrap: "wrap",
             alignItems: "center",
+            justifyContent: "center",
             flexDirection: "column",
             backgroundColor: "black",
+            height: "100vh",
           }}
         >
           <Video ref={myVideoRef} />
           {callAccepted && <Video ref={userVideoRef} />}
+          <div style={{ position: "absolute", bottom: 10 }}>
+            <CloseOutlined
+              onClick={() => {}}
+              style={{
+                color: "red",
+                backgroundColor: "white",
+                padding: 20,
+                borderRadius: "50%",
+              }}
+            />
+          </div>
         </div>
       ) : (
         children

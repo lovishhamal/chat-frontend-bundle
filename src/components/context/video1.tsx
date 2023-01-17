@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-const Video = React.forwardRef((props, ref: any) => {
+const Video1 = React.forwardRef((props, ref: any) => {
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
@@ -15,9 +15,15 @@ const Video = React.forwardRef((props, ref: any) => {
       muted
       autoPlay
       ref={ref}
-      style={{ alignSelf: "center", justifySelf: "center" }}
+      style={{
+        width: 400,
+        height: 400,
+        position: "absolute",
+        right: "10%",
+        bottom: "-5%",
+      }}
     />
   );
 });
 
-export default Video;
+export default Video1;
