@@ -2,16 +2,18 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Avatar, CustomModal } from "../common";
 import { socketIo } from "../util/socket";
 import { AuthContext } from "./authContext";
-import Peer from "simple-peer";
 import Video from "../components/context/video";
 import { CloseOutlined } from "@ant-design/icons";
+import { simplePeer } from "../util/peer";
 
 export const VideoContext = createContext({});
 const socket = socketIo();
 
 const VideoContextProvider = ({ children }: { children: any }) => {
   const { state } = useContext<any>(AuthContext);
-  const myRef = useRef<any>(null);
+  const audio = new Audio(
+    "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+  );
   const userRef = useRef<any>(null);
   const myVideoRef = useRef<any>(null);
   const signalRef = useRef<any>(null);
@@ -26,7 +28,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     socket.off("call_user").on("call_user", ({ signal, data }) => {
       signalRef.current = signal;
       if (state.user._id !== data.caller_id) {
-        myRef?.current.play();
+        audio.play();
         userRef.current = data;
         setOpen(true);
       }
@@ -35,21 +37,24 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const callUser = (data: any) => {
     setCallInitiated(true);
-    const peer = new Peer({
+    const peer = simplePeer({
       initiator: true,
       trickle: false,
-      stream: myVideoRef.current,
+      ref: myVideoRef,
     });
-    peer.on("signal", (signalData) => {
+
+    peer.on("signal", (signalData: any) => {
       socket.emit("call_user", {
         signalData,
         data,
       });
     });
 
-    peer.on("stream", (currentStream) => {
+    peer.on("stream", (currentStream: any) => {
       userVideoRef.current.srcObject = currentStream;
     });
+
+    peer.on("close", (data: any) => {});
 
     socket.on("call_accepted", (signalData) => {
       peer.signal(signalData);
@@ -63,17 +68,13 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     pauseAudio();
     setCallInitiated(true);
     setCallAccepted(true);
-    const peer = new Peer({
-      initiator: false,
-      trickle: false,
-      stream: myVideoRef.current,
-    });
+    const peer = simplePeer({ ref: myVideoRef.current });
 
-    peer.on("signal", (signalData) => {
+    peer.on("signal", (signalData: any) => {
       socket.emit("answer_call", { signalData });
     });
 
-    peer.on("stream", (currentStream) => {
+    peer.on("stream", (currentStream: any) => {
       userVideoRef.current.srcObject = currentStream;
     });
 
@@ -81,7 +82,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     connectionRef.current = peer;
   };
 
-  const pauseAudio = () => myRef.current.pause();
+  const pauseAudio = () => audio.pause();
 
   return (
     <VideoContext.Provider value={{ socket, callUser }}>
@@ -101,7 +102,12 @@ const VideoContextProvider = ({ children }: { children: any }) => {
           {callAccepted && <Video ref={userVideoRef} />}
           <div style={{ position: "absolute", bottom: 10 }}>
             <CloseOutlined
-              onClick={() => {}}
+              onClick={() => {
+                const peer = simplePeer({ ref: myVideoRef.current });
+                peer.destroy();
+                myVideoRef.current.srcObject = null;
+                setCallInitiated(false);
+              }}
               style={{
                 color: "red",
                 backgroundColor: "white",
@@ -132,10 +138,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
           is Calling you
         </div>
       </CustomModal>
-      <audio
-        ref={myRef}
-        src='https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
-      />
     </VideoContext.Provider>
   );
 };
