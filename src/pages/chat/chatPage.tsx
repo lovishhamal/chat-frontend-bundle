@@ -1,5 +1,3 @@
-import React from "react";
-import { Layout } from "antd";
 import {
   SideBarComponent,
   ChatLayoutComponent,
@@ -7,9 +5,6 @@ import {
 import { ChatContext, ChatReducer } from "../../context/chatContext";
 import { MainLayout } from "../../layout";
 import Styles from "./chatPage.module.css";
-import VideoContextProvider from "../../context/videoContext";
-
-const { Sider, Content } = Layout;
 
 const ChatPage = () => {
   const { state, dispatch } = ChatReducer();

@@ -4,82 +4,92 @@ import { socketIo } from "../util/socket";
 import { AuthContext } from "./authContext";
 import Video from "../components/context/video";
 import { CloseOutlined } from "@ant-design/icons";
-import { simplePeer } from "../util/peer";
+import { PeerContext } from "./peerContext";
 
 export const VideoContext = createContext({});
 const socket = socketIo();
 
+let stream = {};
 const VideoContextProvider = ({ children }: { children: any }) => {
   const { state } = useContext<any>(AuthContext);
+  const {
+    peer,
+
+    setRemoteAnswer,
+    sendStream,
+    createAnswer,
+    createOffer,
+  } = useContext<any>(PeerContext);
   const audio = new Audio(
     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   );
+
   const userRef = useRef<any>(null);
   const myVideoRef = useRef<any>(null);
-  const signalRef = useRef<any>(null);
+  const answerRef = useRef<any>(null);
   const userVideoRef = useRef<any>(null);
-  const connectionRef = useRef<any>(null);
   const [open, setOpen] = useState(false);
   const [callAccepted, setCallAccepted] = useState<boolean>(false);
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
+  const [remoteId, setId] = useState<any>("");
 
   useEffect(() => {
-    userRef.current = state.user;
-    socket.off("call_user").on("call_user", ({ signal, data }) => {
-      signalRef.current = signal;
+    socket.off("incoming_call").on("incoming_call", async ({ offer, data }) => {
+      setId(data.caller_id);
       if (state.user._id !== data.caller_id) {
         audio.play();
-        userRef.current = data;
+        answerRef.current = offer;
         setOpen(true);
       }
     });
-  }, []);
-
-  const callUser = (data: any) => {
-    setCallInitiated(true);
-    const peer = simplePeer({
-      initiator: true,
-      trickle: false,
-      ref: myVideoRef,
+    socket.off("call-accepted").on("call_accepted", async (answer) => {
+      setCallAccepted(true);
+      await setRemoteAnswer(answer);
     });
 
-    peer.on("signal", (signalData: any) => {
-      socket.emit("call_user", {
-        signalData,
-        data,
+    peer.addEventListener("negotiationneeded", async () => {
+      const offer = await createOffer();
+
+      socket.emit("call-user", {
+        offer: offer,
+        data: {
+          receiver_id: "63c020049f6f00b3a3d30260",
+          caller_id: "63c01f8b9f6f00b3a3d3025f",
+          name: "lovish hamal",
+          image: "",
+        },
       });
     });
 
-    peer.on("stream", (currentStream: any) => {
-      userVideoRef.current.srcObject = currentStream;
+    peer.addEventListener("track", (track: any) => {
+      console.log("track connected");
+
+      // userVideoRef.current.srcObject = track.streams[0];
     });
 
-    peer.on("close", (data: any) => {});
+    return () => {
+      peer.removeEventListener("track", () => {});
+      peer.removeEventListener("negotiationneeded", () => {});
+    };
+  }, []);
 
-    socket.on("call_accepted", (signalData) => {
-      peer.signal(signalData);
-      setCallAccepted(true);
+  const callUser = async (data: any) => {
+    setCallInitiated(true);
+
+    const offer = await createOffer();
+    socket.emit("call_user", {
+      offer,
+      data,
     });
-
-    connectionRef.current = peer;
   };
 
-  const answerCall = () => {
+  const answerCall = async () => {
     pauseAudio();
     setCallInitiated(true);
     setCallAccepted(true);
-    const peer = simplePeer({ ref: myVideoRef.current });
 
-    peer.on("signal", (signalData: any) => {
-      socket.emit("answer_call", { signalData });
-    });
-
-    peer.on("stream", (currentStream: any) => {
-      userVideoRef.current.srcObject = currentStream;
-    });
-
-    peer.signal(signalRef.current);
-    connectionRef.current = peer;
+    const answer = await createAnswer(answerRef.current);
+    socket.emit("answer_call", { answer });
   };
 
   const pauseAudio = () => audio.pause();
@@ -98,13 +108,11 @@ const VideoContextProvider = ({ children }: { children: any }) => {
             height: "100vh",
           }}
         >
-          <Video ref={myVideoRef} />
+          <Video ref={myVideoRef} myVideo sendStream={sendStream} />
           {callAccepted && <Video ref={userVideoRef} />}
           <div style={{ position: "absolute", bottom: 10 }}>
             <CloseOutlined
               onClick={() => {
-                const peer = simplePeer({ ref: myVideoRef.current });
-                peer.destroy();
                 myVideoRef.current.srcObject = null;
                 setCallInitiated(false);
               }}
