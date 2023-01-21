@@ -20,6 +20,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const peerRef = useRef<any>();
   const otherUser = useRef<any>();
   const userStream = useRef<any>();
+  const [open, setOpen] = useState<any>(false);
 
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
 
@@ -99,8 +100,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const handleRecieveCall = (incoming: any) => {
-    console.log("offer event");
-
     peerRef.current = createPeer();
     const desc = new RTCSessionDescription(incoming.sdp);
     peerRef.current
@@ -129,8 +128,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const handleAnswer = (message: any) => {
-    console.log("answer event");
-
     const desc = new RTCSessionDescription(message.sdp);
     peerRef.current
       .setRemoteDescription(desc)
@@ -165,8 +162,8 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     <VideoContext.Provider value={{ socket, callUser }}>
       <video ref={userVideo} autoPlay muted></video>
       <video ref={partnerVideo} autoPlay muted></video>
-
-      {/* <CustomModal
+      {children}
+      <CustomModal
         title='Video Call'
         open={open}
         setOpen={setOpen}
@@ -176,13 +173,13 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         onCancelPress={pauseAudio}
       >
         <div style={{ display: "flex", alignItems: "center" }}>
-          <Avatar image={userRef.current?.image} />
+          {/* <Avatar image={userRef.current?.image} />
           <h3 style={{ textTransform: "capitalize", marginRight: 5 }}>
             {userRef.current?.name}
-          </h3>
+          </h3> */}
           is Calling you
         </div>
-      </CustomModal> */}
+      </CustomModal>
     </VideoContext.Provider>
   );
 };
