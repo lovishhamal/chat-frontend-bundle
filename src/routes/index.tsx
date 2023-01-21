@@ -11,7 +11,6 @@ import { SET_LOGGED_IN_USER } from "../constants/actions";
 import { LOCAL_STORAGE } from "../constants/common";
 import { uiRoutes } from "../constants/uiRoutes";
 import { AuthContext } from "../context";
-import Peer from "../services/communication/peer";
 
 import { LocalStorage } from "../util/localStorage";
 
@@ -62,7 +61,7 @@ export const AppRoutes = () => {
       <Route
         element={
           <RequireAuth>
-            <Peer />
+            <ChatPage />
           </RequireAuth>
         }
         path={uiRoutes.dashboard}

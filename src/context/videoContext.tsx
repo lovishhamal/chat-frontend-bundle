@@ -12,164 +12,167 @@ const socket = socketIo();
 
 let stream = {};
 const VideoContextProvider = ({ children }: { children: any }) => {
-  const { state } = useContext<any>(AuthContext);
-  const { peer, setRemoteAnswer, sendStream, createAnswer, createOffer } =
-    useContext<any>(PeerContext);
   const audio = new Audio(
     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   );
+  const userVideo = useRef<any>(null);
+  const partnerVideo = useRef<any>(null);
+  const peerRef = useRef<any>();
+  const otherUser = useRef<any>();
+  const userStream = useRef<any>();
 
-  const userRef = useRef<any>(null);
-  const myVideoRef = useRef<any>(null);
-  const answerRef = useRef<any>(null);
-  const userVideoRef = useRef<any>(null);
-  const [open, setOpen] = useState(false);
-  const [callAccepted, setCallAccepted] = useState<boolean>(false);
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
-  const [remoteId, setId] = useState<any>("");
 
   useEffect(() => {
-    // socket.off("incoming_call").on("incoming_call", async ({ offer, data }) => {
-    //   setId(data.caller_id);
-    //   if (state.user._id !== data.caller_id) {
-    //     audio.play();
-    //     answerRef.current = offer;
-    //     setOpen(true);
-    //   }
-    // });
-    // socket.off("call-accepted").on("call_accepted", async (answer) => {
-    //   setCallAccepted(true);
-    //   await setRemoteAnswer(answer);
-    // });
+    if (userVideo.current) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true, video: true })
+        .then((stream: any) => {
+          userVideo.current.srcObject = stream;
+          userStream.current = stream;
 
-    socket.on("offer", async (payload) => {
-      try {
-        const desc = new RTCSessionDescription(payload.sdp);
-        await setRemoteAnswer(desc);
-        console.log("exe 1");
+          socket.emit("join room", 123);
 
-        await sendStream(myVideoRef.current.srcObject);
-        console.log("exe 2");
-        await createAnswer();
-        console.log("peer.localDescription in offer", peer.localDescription);
-        const data = {
-          sdp: peer.localDescription,
-        };
-        socket.emit("answer", data);
-      } catch (error) {
-        console.log("er", error);
-      }
-    });
+          socket.on("other user", (userID: any) => {
+            callUser(userID);
+            otherUser.current = userID;
+          });
 
-    socket.on("ice-candidate", (incoming) => {
-      const candidate = new RTCIceCandidate(incoming);
-      peer.addIceCandidate(candidate);
-    });
+          socket.on("user joined", (userID: any) => {
+            otherUser.current = userID;
+          });
 
-    socket.on("answer", (message: any) => {
-      const desc = new RTCSessionDescription(message.sdp);
-      peer.setRemoteDescription(desc);
-    });
+          socket.on("offer", handleRecieveCall);
 
-    peer.onicecanndiate = handleIceCandidate;
+          socket.on("answer", handleAnswer);
 
-    peer.addEventListener("negotiationneeded", async () => {
-      await createOffer();
-      socket.emit("offer", {
-        data: {
-          receiver_id: "63c020049f6f00b3a3d30260",
-          caller_id: "63c01f8b9f6f00b3a3d3025f",
-          name: "lovish hamal",
-          image: "",
+          socket.on("ice-candidate", handleNewICECandidateMsg);
+        });
+    }
+  }, [userVideo.current]);
+
+  const createPeer = (userID?: any) => {
+    const peer = new RTCPeerConnection({
+      iceServers: [
+        {
+          urls: "stun:stun.stunprotocol.org",
         },
-        sdp: peer.localDescription,
+        {
+          urls: "turn:numb.viagenie.ca",
+          credential: "muazkh",
+          username: "webrtc@live.com",
+        },
+      ],
+    });
+
+    peer.onicecandidate = handleICECandidateEvent;
+    peer.ontrack = handleTrackEvent;
+    peer.onnegotiationneeded = () => handleNegotiationNeededEvent(userID);
+
+    return peer;
+  };
+
+  const callUser = (userID: any) => {
+    peerRef.current = createPeer(userID);
+    userStream.current
+      .getTracks()
+      .forEach((track: any) =>
+        peerRef.current.addTrack(track, userStream.current)
+      );
+  };
+
+  const handleNegotiationNeededEvent = (userID: any) => {
+    peerRef.current
+      .createOffer()
+      .then((offer: any) => {
+        return peerRef.current.setLocalDescription(offer);
+      })
+      .then(() => {
+        const payload = {
+          target: userID,
+          caller: socket.id,
+          sdp: peerRef.current.localDescription,
+        };
+        socket.emit("offer", payload);
+      })
+      .catch((e: any) => console.log(e));
+  };
+
+  const handleRecieveCall = (incoming: any) => {
+    console.log("offer event");
+
+    peerRef.current = createPeer();
+    const desc = new RTCSessionDescription(incoming.sdp);
+    peerRef.current
+      .setRemoteDescription(desc)
+      .then(() => {
+        userStream.current
+          .getTracks()
+          .forEach((track: any) =>
+            peerRef.current.addTrack(track, userStream.current)
+          );
+      })
+      .then(() => {
+        return peerRef.current.createAnswer();
+      })
+      .then((answer: any) => {
+        return peerRef.current.setLocalDescription(answer);
+      })
+      .then(() => {
+        const payload = {
+          target: incoming.caller,
+          caller: socket.id,
+          sdp: peerRef.current.localDescription,
+        };
+        socket.emit("answer", payload);
       });
-    });
+  };
 
-    peer.addEventListener("track", (track: any) => {
-      userVideoRef.current.srcObject = track.streams[0];
-      setCallAccepted(true);
-    });
+  const handleAnswer = (message: any) => {
+    console.log("answer event");
 
-    return () => {
-      peer.removeEventListener("track", () => {});
-      peer.removeEventListener("negotiationneeded", () => {});
-    };
-  }, []);
+    const desc = new RTCSessionDescription(message.sdp);
+    peerRef.current
+      .setRemoteDescription(desc)
+      .catch((e: any) => console.log(e));
+  };
 
-  const handleIceCandidate = (e: any) => {
+  const handleICECandidateEvent = (e: any) => {
     if (e.candidate) {
-      const p = { candidate: e.candidate };
-      socket.emit("ice-candidate", p);
+      const payload = {
+        target: otherUser.current,
+        candidate: e.candidate,
+      };
+      socket.emit("ice-candidate", payload);
     }
   };
 
-  const callUser = async (data: any) => {
-    setCallInitiated(true);
+  const handleNewICECandidateMsg = (incoming: any) => {
+    const candidate = new RTCIceCandidate(incoming);
 
-    if (myVideoRef.current) {
-      sendStream(myVideoRef.current.srcObject);
-    }
-    // socket.emit("call_user", {
-    //   offer,
-    //   data,
-    // });
+    peerRef.current
+      .addIceCandidate(candidate)
+      .catch((e: any) => console.log(e));
   };
 
-  const answerCall = async () => {
-    pauseAudio();
-    setCallInitiated(true);
-    setCallAccepted(true);
-
-    // const answer = await createAnswer(answerRef.current);
-    // // socket.emit("answer_call", { answer });
-  };
+  function handleTrackEvent(e: any) {
+    partnerVideo.current.srcObject = e.streams[0];
+  }
 
   const pauseAudio = () => audio.pause();
 
   return (
     <VideoContext.Provider value={{ socket, callUser }}>
-      {callInitiated ? (
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column",
-            backgroundColor: "black",
-            height: "100vh",
-          }}
-        >
-          <Video ref={myVideoRef} myVideo callUser={callUser} />
-          <Video ref={userVideoRef} />
-          {/* <Video ref={userVideoRef} /> */}
-          <div style={{ position: "absolute", bottom: 10 }}>
-            <CloseOutlined
-              onClick={() => {
-                myVideoRef.current.srcObject = null;
-                setCallInitiated(false);
-              }}
-              style={{
-                color: "red",
-                backgroundColor: "white",
-                padding: 20,
-                borderRadius: "50%",
-              }}
-            />
-          </div>
-        </div>
-      ) : (
-        children
-      )}
+      <video ref={userVideo} autoPlay muted></video>
+      <video ref={partnerVideo} autoPlay muted></video>
 
-      <CustomModal
+      {/* <CustomModal
         title='Video Call'
         open={open}
         setOpen={setOpen}
         okText='Answer'
         cancelText='Decline'
-        onOkPress={answerCall}
+        onOkPress={() => {}}
         onCancelPress={pauseAudio}
       >
         <div style={{ display: "flex", alignItems: "center" }}>
@@ -179,7 +182,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
           </h3>
           is Calling you
         </div>
-      </CustomModal>
+      </CustomModal> */}
     </VideoContext.Provider>
   );
 };
