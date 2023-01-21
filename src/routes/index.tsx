@@ -11,6 +11,8 @@ import { SET_LOGGED_IN_USER } from "../constants/actions";
 import { LOCAL_STORAGE } from "../constants/common";
 import { uiRoutes } from "../constants/uiRoutes";
 import { AuthContext } from "../context";
+import Peer from "../services/communication/peer";
+
 import { LocalStorage } from "../util/localStorage";
 
 const LoginPage = LazyLoader(lazy(() => import("../pages/auth/login")));
@@ -60,7 +62,7 @@ export const AppRoutes = () => {
       <Route
         element={
           <RequireAuth>
-            <ChatPage />
+            <Peer />
           </RequireAuth>
         }
         path={uiRoutes.dashboard}

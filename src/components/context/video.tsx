@@ -8,22 +8,12 @@ const Video = React.forwardRef((props: any, ref: any) => {
         .getUserMedia({ video: true, audio: true })
         .then((currentStream) => {
           ref.current.srcObject = currentStream;
-          props.sendStream(currentStream);
+          props.callUser();
         });
     }
   }, []);
 
-  return (
-    <>
-      <video
-        playsInline
-        muted
-        autoPlay
-        ref={ref}
-        style={{ alignSelf: "center", justifySelf: "center" }}
-      />
-    </>
-  );
+  return <video playsInline muted autoPlay ref={ref} />;
 });
 
 export default Video;
