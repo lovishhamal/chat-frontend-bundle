@@ -31,14 +31,14 @@ const VideoContextProvider = ({ children }: { children: any }) => {
           userVideo.current.srcObject = stream;
           userStream.current = stream;
 
-          socket.emit("join room", 123);
+          socket.emit("join_room", 123);
 
-          socket.on("other user", (userID: any) => {
+          socket.on("other_user", (userID: any) => {
             callUser(userID);
             otherUser.current = userID;
           });
 
-          socket.on("user joined", (userID: any) => {
+          socket.on("user_joined", (userID: any) => {
             otherUser.current = userID;
           });
 
