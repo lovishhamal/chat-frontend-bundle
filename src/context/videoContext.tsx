@@ -19,6 +19,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   );
   const userVideo = useRef<any>(null);
   const partnerVideo = useRef<any>(null);
+
   const peerRef = useRef<any>();
   const otherUser = useRef<any>();
   const userStream = useRef<any>();
@@ -177,8 +178,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
           <div>
             <Video
               ref={partnerVideo}
-              myVideo
-              initiateCall={initiateCall}
               style={{ height: "100vh", width: "100vw" }}
             />
           </div>
@@ -189,13 +188,36 @@ const VideoContextProvider = ({ children }: { children: any }) => {
               bottom: -100,
             }}
           >
-            <Video ref={userVideo} style={{ height: 600, width: 300 }} />
+            <Video
+              ref={userVideo}
+              myVideo
+              initiateCall={initiateCall}
+              style={{ height: 600, width: 300 }}
+            />
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              bottom: 10,
+              left: "50%",
+              backgroundColor: "red",
+              borderRadius: 100,
+              width: 50,
+              height: 50,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onClick={() => {
+              peerRef.current.close();
+            }}
+          >
+            <CloseOutlined style={{ color: "#ffffff" }} />
           </div>
         </div>
       ) : (
         children
       )}
-
       <CustomModal
         title='Video Call'
         open={open}
