@@ -1,11 +1,9 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { Avatar, CustomModal } from "../common";
+import { CustomModal } from "../common";
 import { socketIo } from "../util/socket";
 import { AuthContext } from "./authContext";
 import Video from "../components/context/video";
 import { CloseOutlined } from "@ant-design/icons";
-import { PeerContext } from "./peerContext";
-import { message } from "antd";
 
 export const VideoContext = createContext({});
 const socket = socketIo();
@@ -210,6 +208,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
             }}
             onClick={() => {
               peerRef.current.close();
+              setCallInitiated(false);
             }}
           >
             <CloseOutlined style={{ color: "#ffffff" }} />
