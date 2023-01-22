@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { CustomModal } from "../common";
+import { Avatar, CustomModal } from "../common";
 import { socketIo } from "../util/socket";
 import { AuthContext } from "./authContext";
 import Video from "../components/context/video";
@@ -15,24 +15,26 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const audio = new Audio(
     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   );
-  const userVideo = useRef<any>(null);
-  const partnerVideo = useRef<any>(null);
-
+  const userVideoRef = useRef<any>(null);
+  const partnerVideoRef = useRef<any>(null);
   const peerRef = useRef<any>();
   const otherUser = useRef<any>();
   const userStream = useRef<any>();
   const [open, setOpen] = useState<any>(false);
 
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
-  const [callAccepted, setCallAccepted] = useState<boolean>(false);
 
   useEffect(() => {
-    socket.on("call_user", (userId: any, connection_id) => {
-      if (state.user._id === userId) {
-        connectionId = connection_id;
-        setOpen(true);
+    socket.on(
+      "call_user",
+      ({ connectionId: connection_id, receiverInfo: receiver_info }) => {
+        if (state.user._id === receiver_info.receiver_id) {
+          receiverInfo = receiver_info;
+          connectionId = connection_id;
+          setOpen(true);
+        }
       }
-    });
+    );
 
     socket.on("other_user", (userID: any) => {
       callUser(userID);
@@ -151,20 +153,20 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   function handleTrackEvent(e: any) {
-    partnerVideo.current.srcObject = e.streams[0];
-    setCallAccepted(true);
+    partnerVideoRef.current.srcObject = e.streams[0];
   }
 
   const pauseAudio = () => audio.pause();
 
   const initiateCall = (stream: any) => {
-    userVideo.current.srcObject = stream;
+    userVideoRef.current.srcObject = stream;
     userStream.current = stream;
-    socket.emit("join_room", connectionId, receiverInfo.receiver_id);
+    socket.emit("join_room", { connectionId, receiverInfo });
   };
 
   const onPressVideo = (payload: any) => {
     receiverInfo = payload;
+
     connectionId = payload.connectionId;
     setCallInitiated(true);
   };
@@ -175,7 +177,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         <div style={{ position: "relative", backgroundColor: "black" }}>
           <div>
             <Video
-              ref={partnerVideo}
+              ref={partnerVideoRef}
               style={{ height: "100vh", width: "100vw" }}
             />
           </div>
@@ -187,7 +189,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
             }}
           >
             <Video
-              ref={userVideo}
+              ref={userVideoRef}
               myVideo
               initiateCall={initiateCall}
               style={{ height: 600, width: 300 }}
@@ -229,10 +231,10 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         onCancelPress={pauseAudio}
       >
         <div style={{ display: "flex", alignItems: "center" }}>
-          {/* <Avatar image={userRef.current?.image} />
+          <Avatar image={receiverInfo?.image} />
           <h3 style={{ textTransform: "capitalize", marginRight: 5 }}>
-            {userRef.current?.name}
-          </h3> */}
+            {receiverInfo?.name}
+          </h3>
           is Calling you
         </div>
       </CustomModal>
