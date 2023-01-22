@@ -11,7 +11,7 @@ const Video = React.forwardRef((props: any, ref: any) => {
     }
   }, []);
 
-  return <video playsInline muted autoPlay ref={ref} />;
+  return <video playsInline muted autoPlay ref={ref} style={props.style} />;
 });
 
 export default Video;

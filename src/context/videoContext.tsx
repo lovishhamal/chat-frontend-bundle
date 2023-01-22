@@ -29,8 +29,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   useEffect(() => {
     socket.on("call_user", (userId: any, connection_id) => {
-      console.log("connection_id", connection_id);
-
       if (state.user._id === userId) {
         connectionId = connection_id;
         setOpen(true);
@@ -155,6 +153,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   function handleTrackEvent(e: any) {
     partnerVideo.current.srcObject = e.streams[0];
+    setCallAccepted(true);
   }
 
   const pauseAudio = () => audio.pause();
@@ -166,8 +165,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const onPressVideo = (payload: any) => {
-    console.log(" payload.connectionId", payload.connectionId);
-
     receiverInfo = payload;
     connectionId = payload.connectionId;
     setCallInitiated(true);
@@ -175,11 +172,30 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   return (
     <VideoContext.Provider value={{ socket, callUser: onPressVideo }}>
-      {callInitiated && (
-        <Video ref={userVideo} myVideo initiateCall={initiateCall}></Video>
+      {callInitiated ? (
+        <div style={{ position: "relative", backgroundColor: "black" }}>
+          <div>
+            <Video
+              ref={partnerVideo}
+              myVideo
+              initiateCall={initiateCall}
+              style={{ height: "100vh", width: "100vw" }}
+            />
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              right: 50,
+              bottom: -100,
+            }}
+          >
+            <Video ref={userVideo} style={{ height: 600, width: 300 }} />
+          </div>
+        </div>
+      ) : (
+        children
       )}
-      <Video ref={partnerVideo}></Video>
-      {children}
+
       <CustomModal
         title='Video Call'
         open={open}
