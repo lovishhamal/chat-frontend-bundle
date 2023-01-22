@@ -19,7 +19,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const partnerVideoRef = useRef<any>(null);
   const peerRef = useRef<any>();
   const otherUser = useRef<any>();
-  const userStream = useRef<any>();
   const [open, setOpen] = useState<any>(false);
 
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
@@ -36,13 +35,13 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       }
     );
 
-    socket.on("other_user", (userID: any) => {
-      callUser(userID);
-      otherUser.current = userID;
+    socket.on("other_user", (userId: any) => {
+      callUser(userId);
+      otherUser.current = userId;
     });
 
-    socket.on("user_joined", (userID: any) => {
-      otherUser.current = userID;
+    socket.on("user_joined", (userId: any) => {
+      otherUser.current = userId;
     });
 
     socket.on("offer", handleRecieveCall);
@@ -75,14 +74,14 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const callUser = (userID: any) => {
     peerRef.current = createPeer(userID);
-    userStream.current
+    userVideoRef.current.srcObject
       .getTracks()
       .forEach((track: any) =>
-        peerRef.current.addTrack(track, userStream.current)
+        peerRef.current.addTrack(track, userVideoRef.current.srcObject)
       );
   };
 
-  const handleNegotiationNeededEvent = (userID: any) => {
+  const handleNegotiationNeededEvent = (userId: any) => {
     peerRef.current
       .createOffer()
       .then((offer: any) => {
@@ -90,7 +89,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       })
       .then(() => {
         const payload = {
-          target: userID,
+          receiver: userId,
           caller: socket.id,
           sdp: peerRef.current.localDescription,
         };
@@ -100,15 +99,17 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const handleRecieveCall = (incoming: any) => {
+    console.log("incoming", incoming?.caller);
+    console.log("incoming payload", incoming);
     peerRef.current = createPeer();
     const desc = new RTCSessionDescription(incoming.sdp);
     peerRef.current
       .setRemoteDescription(desc)
       .then(() => {
-        userStream.current
+        userVideoRef.current.srcObject
           .getTracks()
           .forEach((track: any) =>
-            peerRef.current.addTrack(track, userStream.current)
+            peerRef.current.addTrack(track, userVideoRef.current.srcObject)
           );
       })
       .then(() => {
@@ -119,7 +120,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       })
       .then(() => {
         const payload = {
-          target: incoming.caller,
+          receiver: incoming.caller,
           caller: socket.id,
           sdp: peerRef.current.localDescription,
         };
@@ -137,7 +138,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const handleICECandidateEvent = (e: any) => {
     if (e.candidate) {
       const payload = {
-        target: otherUser.current,
+        receiver: otherUser.current,
         candidate: e.candidate,
       };
       socket.emit("ice_candidate", payload);
@@ -160,7 +161,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const initiateCall = (stream: any) => {
     userVideoRef.current.srcObject = stream;
-    userStream.current = stream;
     socket.emit("join_room", { connectionId, receiverInfo });
   };
 
@@ -209,8 +209,14 @@ const VideoContextProvider = ({ children }: { children: any }) => {
               justifyContent: "center",
             }}
             onClick={() => {
-              peerRef.current.close();
-              setCallInitiated(false);
+              userVideoRef.current.srcObject
+                .getTracks()
+                .forEach(function (track: any) {
+                  track.stop();
+                  console.log("ttrack", track);
+                });
+              // peerRef.current.close();
+              // setCallInitiated(false);
             }}
           >
             <CloseOutlined style={{ color: "#ffffff" }} />
