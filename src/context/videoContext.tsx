@@ -11,6 +11,7 @@ export const VideoContext = createContext({});
 const socket = socketIo();
 
 let receiverInfo: any = {};
+let connectionId: string = "";
 const VideoContextProvider = ({ children }: { children: any }) => {
   const { state } = useContext<any>(AuthContext);
   const audio = new Audio(
@@ -27,8 +28,11 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const [callAccepted, setCallAccepted] = useState<boolean>(false);
 
   useEffect(() => {
-    socket.on("call_user", (userID: any) => {
-      if (state.user._id === userID) {
+    socket.on("call_user", (userId: any, connection_id) => {
+      console.log("connection_id", connection_id);
+
+      if (state.user._id === userId) {
+        connectionId = connection_id;
         setOpen(true);
       }
     });
@@ -158,11 +162,14 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const initiateCall = (stream: any) => {
     userVideo.current.srcObject = stream;
     userStream.current = stream;
-    socket.emit("join_room", 123, receiverInfo.receiver_id);
+    socket.emit("join_room", connectionId, receiverInfo.receiver_id);
   };
 
   const onPressVideo = (payload: any) => {
+    console.log(" payload.connectionId", payload.connectionId);
+
     receiverInfo = payload;
+    connectionId = payload.connectionId;
     setCallInitiated(true);
   };
 
