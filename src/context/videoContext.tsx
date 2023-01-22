@@ -10,6 +10,7 @@ const socket = socketIo();
 
 let receiverInfo: any = {};
 let connectionId: string = "";
+
 const VideoContextProvider = ({ children }: { children: any }) => {
   const { state } = useContext<any>(AuthContext);
   const audio = new Audio(
@@ -99,8 +100,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const handleRecieveCall = (incoming: any) => {
-    console.log("incoming", incoming?.caller);
-    console.log("incoming payload", incoming);
     peerRef.current = createPeer();
     const desc = new RTCSessionDescription(incoming.sdp);
     peerRef.current
@@ -161,6 +160,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const initiateCall = (stream: any) => {
     userVideoRef.current.srcObject = stream;
+
     socket.emit("join_room", { connectionId, receiverInfo });
   };
 
@@ -211,12 +211,14 @@ const VideoContextProvider = ({ children }: { children: any }) => {
             onClick={() => {
               userVideoRef.current.srcObject
                 .getTracks()
-                .forEach(function (track: any) {
+                .forEach((track: any) => {
+                  track.enabled = false;
                   track.stop();
-                  console.log("ttrack", track);
                 });
-              // peerRef.current.close();
-              // setCallInitiated(false);
+              userVideoRef.current = null;
+              peerRef.current.close();
+
+              setCallInitiated(false);
             }}
           >
             <CloseOutlined style={{ color: "#ffffff" }} />

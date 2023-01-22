@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+let c = 0;
 const Video = React.forwardRef((props: any, ref: any) => {
   useEffect(() => {
     if (props.myVideo) {
