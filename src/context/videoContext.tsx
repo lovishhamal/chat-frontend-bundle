@@ -10,8 +10,9 @@ import { message } from "antd";
 export const VideoContext = createContext({});
 const socket = socketIo();
 
-let stream = {};
+let receiverInfo: any = {};
 const VideoContextProvider = ({ children }: { children: any }) => {
+  const { state } = useContext<any>(AuthContext);
   const audio = new Audio(
     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   );
@@ -23,8 +24,15 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const [open, setOpen] = useState<any>(false);
 
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
+  const [callAccepted, setCallAccepted] = useState<boolean>(false);
 
   useEffect(() => {
+    socket.on("call_user", (userID: any) => {
+      if (state.user._id === userID) {
+        setOpen(true);
+      }
+    });
+
     socket.on("other_user", (userID: any) => {
       callUser(userID);
       otherUser.current = userID;
@@ -150,12 +158,19 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const initiateCall = (stream: any) => {
     userVideo.current.srcObject = stream;
     userStream.current = stream;
-    socket.emit("join_room", 123);
+    socket.emit("join_room", 123, receiverInfo.receiver_id);
+  };
+
+  const onPressVideo = (payload: any) => {
+    receiverInfo = payload;
+    setCallInitiated(true);
   };
 
   return (
-    <VideoContext.Provider value={{ socket, callUser }}>
-      <Video ref={userVideo} myVideo initiateCall={initiateCall}></Video>
+    <VideoContext.Provider value={{ socket, callUser: onPressVideo }}>
+      {callInitiated && (
+        <Video ref={userVideo} myVideo initiateCall={initiateCall}></Video>
+      )}
       <Video ref={partnerVideo}></Video>
       {children}
       <CustomModal
@@ -164,7 +179,9 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         setOpen={setOpen}
         okText='Answer'
         cancelText='Decline'
-        onOkPress={() => {}}
+        onOkPress={() => {
+          setCallInitiated(true);
+        }}
         onCancelPress={pauseAudio}
       >
         <div style={{ display: "flex", alignItems: "center" }}>
