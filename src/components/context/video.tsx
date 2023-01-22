@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Peer from "../../util/peer";
 
 const Video = React.forwardRef((props: any, ref: any) => {
   useEffect(() => {
@@ -7,8 +6,7 @@ const Video = React.forwardRef((props: any, ref: any) => {
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((currentStream) => {
-          ref.current.srcObject = currentStream;
-          props.callUser();
+          props.initiateCall(currentStream);
         });
     }
   }, []);

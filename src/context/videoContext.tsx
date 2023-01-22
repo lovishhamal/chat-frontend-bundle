@@ -25,32 +25,21 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
 
   useEffect(() => {
-    if (userVideo.current) {
-      navigator.mediaDevices
-        .getUserMedia({ audio: true, video: true })
-        .then((stream: any) => {
-          userVideo.current.srcObject = stream;
-          userStream.current = stream;
+    socket.on("other_user", (userID: any) => {
+      callUser(userID);
+      otherUser.current = userID;
+    });
 
-          socket.emit("join_room", 123);
+    socket.on("user_joined", (userID: any) => {
+      otherUser.current = userID;
+    });
 
-          socket.on("other_user", (userID: any) => {
-            callUser(userID);
-            otherUser.current = userID;
-          });
+    socket.on("offer", handleRecieveCall);
 
-          socket.on("user_joined", (userID: any) => {
-            otherUser.current = userID;
-          });
+    socket.on("answer", handleAnswer);
 
-          socket.on("offer", handleRecieveCall);
-
-          socket.on("answer", handleAnswer);
-
-          socket.on("ice-candidate", handleNewICECandidateMsg);
-        });
-    }
-  }, [userVideo.current]);
+    socket.on("ice_candidate", handleNewICECandidateMsg);
+  }, []);
 
   const createPeer = (userID?: any) => {
     const peer = new RTCPeerConnection({
@@ -140,7 +129,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         target: otherUser.current,
         candidate: e.candidate,
       };
-      socket.emit("ice-candidate", payload);
+      socket.emit("ice_candidate", payload);
     }
   };
 
@@ -158,10 +147,16 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const pauseAudio = () => audio.pause();
 
+  const initiateCall = (stream: any) => {
+    userVideo.current.srcObject = stream;
+    userStream.current = stream;
+    socket.emit("join_room", 123);
+  };
+
   return (
     <VideoContext.Provider value={{ socket, callUser }}>
-      <video ref={userVideo} autoPlay muted></video>
-      <video ref={partnerVideo} autoPlay muted></video>
+      <Video ref={userVideo} myVideo initiateCall={initiateCall}></Video>
+      <Video ref={partnerVideo}></Video>
       {children}
       <CustomModal
         title='Video Call'
