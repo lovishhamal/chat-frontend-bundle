@@ -6,15 +6,12 @@ import React, {
   useImperativeHandle,
   useState,
 } from "react";
-import AutoCompleteSearch from "../textSearch";
 
 const CustomModal = forwardRef(
   (
     {
       title = "Modal",
       footer = true,
-      open,
-      setOpen,
       children,
       okText = "Create",
       cancelText = "Cancel",
@@ -22,8 +19,6 @@ const CustomModal = forwardRef(
       onCancelPress = () => {},
     }: {
       title?: string;
-      open: boolean;
-      setOpen: Dispatch<SetStateAction<boolean>>;
       children: React.ReactNode;
       footer?: boolean;
       okText?: string;
@@ -33,6 +28,18 @@ const CustomModal = forwardRef(
     },
     ref
   ) => {
+    const [open, setOpen] = useState(false);
+    useImperativeHandle(
+      ref,
+      () => {
+        return {
+          openModal: () => setOpen(true),
+          closeModal: () => setOpen(false),
+        };
+      },
+      []
+    );
+
     return (
       <Modal
         title={title}

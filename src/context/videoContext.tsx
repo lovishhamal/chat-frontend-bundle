@@ -16,11 +16,12 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const audio = new Audio(
     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   );
+
+  const modalRef = useRef<any>(null);
   const userVideoRef = useRef<any>(null);
   const partnerVideoRef = useRef<any>(null);
   const peerRef = useRef<any>();
   const otherUser = useRef<any>();
-  const [open, setOpen] = useState<any>(false);
 
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
 
@@ -31,7 +32,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         if (state.user._id === receiver_info.receiver_id) {
           receiverInfo = receiver_info;
           connectionId = connection_id;
-          setOpen(true);
+          modalRef.current.openModal();
         }
       }
     );
@@ -227,9 +228,8 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         children
       )}
       <CustomModal
+        ref={modalRef}
         title='Video Call'
-        open={open}
-        setOpen={setOpen}
         okText='Answer'
         cancelText='Decline'
         onOkPress={() => {

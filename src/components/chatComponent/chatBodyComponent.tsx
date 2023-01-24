@@ -27,6 +27,7 @@ export const ChatBodyComponent = () => {
 
   const connectionId = useRef<string>("");
   const messagesEndRef = useRef<any>(null);
+  const modalRef = useRef<any>(null);
   const inputRef = useRef<any>(null);
   const imageRef = useRef<any>(null);
   const { state, dispatch } = useContext<any>(ChatContext);
@@ -91,12 +92,7 @@ export const ChatBodyComponent = () => {
 
   return (
     <>
-      <CustomModal
-        open={open}
-        setOpen={setOpen}
-        title='Create a group'
-        footer={false}
-      >
+      <CustomModal ref={modalRef} title='Create a group' footer={false}>
         <AddUserListModal
           setOpen={setOpen}
           connectionId={connectionId.current}
@@ -115,7 +111,7 @@ export const ChatBodyComponent = () => {
               className={Styles.icon}
               onClick={() => {
                 connectionId.current = state.user._id;
-                setOpen(true);
+                modalRef.current.openModal();
               }}
             >
               <PlusOutlined />
