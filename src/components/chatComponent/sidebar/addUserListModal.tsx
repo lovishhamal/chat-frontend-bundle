@@ -10,7 +10,13 @@ import { CheckCircleOutlined } from "@ant-design/icons";
 import Styles from "./addUserModal.module.css";
 import { ConnectionType } from "../../../enums/common";
 
-const AddUserListModal = ({ setOpen }: { setOpen: any }) => {
+const AddUserListModal = ({
+  setOpen,
+  connectionId,
+}: {
+  setOpen: any;
+  connectionId: string;
+}) => {
   const inputRef = useRef<any>(null);
   const { state } = useContext<any>(AuthContext);
   const [loading, setLoading] = useState(false);
@@ -18,7 +24,7 @@ const AddUserListModal = ({ setOpen }: { setOpen: any }) => {
   const [selectedUserId, setSelectedUserId] = useState<any>([]);
 
   const getUsers = () => {
-    geAllConnectionService(state.user._id).then((data) => {
+    geAllConnectionService(state.user._id, connectionId).then((data) => {
       if (data?.length) {
         setUsers(data);
       }
@@ -45,11 +51,6 @@ const AddUserListModal = ({ setOpen }: { setOpen: any }) => {
 
   return (
     <>
-      <h1>Group name</h1>
-      <div className={Styles.btn}>
-        <input type='text' placeholder='Enter group name' ref={inputRef} />
-      </div>
-      <h1>Friends</h1>
       <List
         itemLayout='horizontal'
         dataSource={users}

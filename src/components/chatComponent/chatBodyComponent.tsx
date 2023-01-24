@@ -17,19 +17,23 @@ import { ReceiverBoxComponent } from "./receiverBoxComponent";
 import { AuthContext } from "../../context";
 import { LocalStorage } from "../../util/localStorage";
 import Styles from "./chatBodyComponent.module.css";
-import { UploadPhoto } from "../../common";
+import { CustomModal, UploadPhoto } from "../../common";
 import AvatarComponent from "../../common/avatar";
 import { VideoContext } from "../../context/videoContext";
+import AddUserListModal from "./sidebar/addUserListModal";
 
 export const ChatBodyComponent = () => {
   const { socket, callUser } = useContext<any>(VideoContext);
 
+  const connectionId = useRef<string>("");
   const messagesEndRef = useRef<any>(null);
   const inputRef = useRef<any>(null);
   const imageRef = useRef<any>(null);
   const { state, dispatch } = useContext<any>(ChatContext);
   const { state: authState } = useContext<any>(AuthContext);
   const [showUploadFile, setShowUploadFile] = useState<boolean>(false);
+
+  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
     socket.emit("new-user-add", authState.user?._id);
@@ -86,89 +90,114 @@ export const ChatBodyComponent = () => {
   };
 
   return (
-    <div style={{ width: "100%" }}>
-      <div className={Styles.header}>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <AvatarComponent image={state.user?.image?.data} />
-          <h1 style={{ textTransform: "capitalize" }}>{state.user.userName}</h1>
-        </div>
-        <div className={Styles.iconWrapper}>
-          <div className={Styles.icon}>
-            <PhoneOutlined />
+    <>
+      <CustomModal
+        open={open}
+        setOpen={setOpen}
+        title='Create a group'
+        footer={false}
+      >
+        <AddUserListModal
+          setOpen={setOpen}
+          connectionId={connectionId.current}
+        />
+      </CustomModal>
+      <div style={{ width: "100%" }}>
+        <div className={Styles.header}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <AvatarComponent image={state.user?.image?.data} />
+            <h1 style={{ textTransform: "capitalize" }}>
+              {state.user.userName}
+            </h1>
           </div>
-          <div className={Styles.iconGap} />
-          <div
-            className={Styles.icon}
-            onClick={() => {
-              const receiver = {
-                connectionId: state.user.connectionId,
-                receiver_id: state.user._id,
-                caller_id: authState.user._id,
-                name: authState.user.userName,
-                image: authState.user.image.data,
-              };
-              callUser(receiver);
-            }}
-          >
-            <VideoCameraOutlined />
-          </div>
-        </div>
-      </div>
-      <div className={Styles.mainChatContent}>
-        <div
-          className={
-            showUploadFile ? Styles.contentBody : Styles.contentBodyOverflow
-          }
-        >
-          <List
-            style={{ width: "100%", overflow: "scroll" }}
-            itemLayout='horizontal'
-            dataSource={state.messages}
-            renderItem={(item: IMessage) => {
-              return (
-                <>
-                  {authState?.user._id === item.sentBy ? (
-                    <SenderBoxComponent item={item} />
-                  ) : (
-                    <ReceiverBoxComponent item={item} />
-                  )}
-                  <div ref={messagesEndRef} />
-                </>
-              );
-            }}
-          />
-        </div>
-        <div className={Styles.messageInputWrapper}>
-          {showUploadFile && (
-            <div>
-              <UploadPhoto
-                handleChange={(item: any) => (imageRef.current = item)}
-              />
-              <Divider />
+          <div className={Styles.iconWrapper}>
+            <div
+              className={Styles.icon}
+              onClick={() => {
+                connectionId.current = state.user._id;
+                setOpen(true);
+              }}
+            >
+              <PlusOutlined />
             </div>
-          )}
-          <div className={Styles.sendNewMessage}>
-            <button
-              className='addFiles'
-              onClick={() => setShowUploadFile(!showUploadFile)}
+            <div className={Styles.iconGap} />
+            <div className={Styles.icon}>
+              <PhoneOutlined />
+            </div>
+            <div className={Styles.iconGap} />
+            <div
+              className={Styles.icon}
+              onClick={() => {
+                const receiver = {
+                  connectionId: state.user.connectionId,
+                  receiver_id: state.user._id,
+                  caller_id: authState.user._id,
+                  name: authState.user.userName,
+                  image: authState.user.image.data,
+                };
+                callUser(receiver);
+              }}
             >
-              {showUploadFile ? <CloseOutlined /> : <PlusOutlined />}
-            </button>
-            <input
-              type='text'
-              placeholder='Type a message here'
-              ref={inputRef}
+              <VideoCameraOutlined />
+            </div>
+          </div>
+        </div>
+        <div className={Styles.mainChatContent}>
+          <div
+            className={
+              showUploadFile ? Styles.contentBody : Styles.contentBodyOverflow
+            }
+          >
+            <List
+              style={{ width: "100%", overflow: "scroll" }}
+              itemLayout='horizontal'
+              dataSource={state.messages}
+              renderItem={(item: IMessage) => {
+                return (
+                  <>
+                    {authState?.user._id === item.sentBy ? (
+                      <SenderBoxComponent item={item} />
+                    ) : (
+                      <ReceiverBoxComponent item={item} />
+                    )}
+                    <div ref={messagesEndRef} />
+                  </>
+                );
+              }}
             />
-            <button
-              className='btnSendMsg'
-              id='sendMsgBtn'
-              onClick={onClickSend}
-            >
-              <SendOutlined />
-            </button>
+          </div>
+          <div className={Styles.messageInputWrapper}>
+            {showUploadFile && (
+              <div>
+                <UploadPhoto
+                  handleChange={(item: any) => (imageRef.current = item)}
+                />
+                <Divider />
+              </div>
+            )}
+            <div className={Styles.sendNewMessage}>
+              <button
+                className='addFiles'
+                onClick={() => setShowUploadFile(!showUploadFile)}
+              >
+                {showUploadFile ? <CloseOutlined /> : <PlusOutlined />}
+              </button>
+              <input
+                type='text'
+                placeholder='Type a message here'
+                ref={inputRef}
+              />
+              <button
+                className='btnSendMsg'
+                id='sendMsgBtn'
+                onClick={onClickSend}
+              >
+                <SendOutlined />
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };

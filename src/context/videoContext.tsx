@@ -217,7 +217,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 });
               userVideoRef.current = null;
               peerRef.current.close();
-
               setCallInitiated(false);
             }}
           >
