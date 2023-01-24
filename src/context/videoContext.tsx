@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { CustomModal } from "../common";
+import { Avatar, CustomModal } from "../common";
 import { socketIo } from "../util/socket";
 import { AuthContext } from "./authContext";
 import Video from "../components/context/video";
@@ -10,37 +10,39 @@ const socket = socketIo();
 
 let receiverInfo: any = {};
 let connectionId: string = "";
+
 const VideoContextProvider = ({ children }: { children: any }) => {
   const { state } = useContext<any>(AuthContext);
   const audio = new Audio(
     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   );
-  const userVideo = useRef<any>(null);
-  const partnerVideo = useRef<any>(null);
-
+  const userVideoRef = useRef<any>(null);
+  const partnerVideoRef = useRef<any>(null);
   const peerRef = useRef<any>();
   const otherUser = useRef<any>();
-  const userStream = useRef<any>();
   const [open, setOpen] = useState<any>(false);
 
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
-  const [callAccepted, setCallAccepted] = useState<boolean>(false);
 
   useEffect(() => {
-    socket.on("call_user", (userId: any, connection_id) => {
-      if (state.user._id === userId) {
-        connectionId = connection_id;
-        setOpen(true);
+    socket.on(
+      "call_user",
+      ({ connectionId: connection_id, receiverInfo: receiver_info }) => {
+        if (state.user._id === receiver_info.receiver_id) {
+          receiverInfo = receiver_info;
+          connectionId = connection_id;
+          setOpen(true);
+        }
       }
+    );
+
+    socket.on("other_user", (userId: any) => {
+      callUser(userId);
+      otherUser.current = userId;
     });
 
-    socket.on("other_user", (userID: any) => {
-      callUser(userID);
-      otherUser.current = userID;
-    });
-
-    socket.on("user_joined", (userID: any) => {
-      otherUser.current = userID;
+    socket.on("user_joined", (userId: any) => {
+      otherUser.current = userId;
     });
 
     socket.on("offer", handleRecieveCall);
@@ -73,14 +75,14 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const callUser = (userID: any) => {
     peerRef.current = createPeer(userID);
-    userStream.current
+    userVideoRef.current.srcObject
       .getTracks()
       .forEach((track: any) =>
-        peerRef.current.addTrack(track, userStream.current)
+        peerRef.current.addTrack(track, userVideoRef.current.srcObject)
       );
   };
 
-  const handleNegotiationNeededEvent = (userID: any) => {
+  const handleNegotiationNeededEvent = (userId: any) => {
     peerRef.current
       .createOffer()
       .then((offer: any) => {
@@ -88,7 +90,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       })
       .then(() => {
         const payload = {
-          target: userID,
+          receiver: userId,
           caller: socket.id,
           sdp: peerRef.current.localDescription,
         };
@@ -103,10 +105,10 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     peerRef.current
       .setRemoteDescription(desc)
       .then(() => {
-        userStream.current
+        userVideoRef.current.srcObject
           .getTracks()
           .forEach((track: any) =>
-            peerRef.current.addTrack(track, userStream.current)
+            peerRef.current.addTrack(track, userVideoRef.current.srcObject)
           );
       })
       .then(() => {
@@ -117,7 +119,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       })
       .then(() => {
         const payload = {
-          target: incoming.caller,
+          receiver: incoming.caller,
           caller: socket.id,
           sdp: peerRef.current.localDescription,
         };
@@ -135,7 +137,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const handleICECandidateEvent = (e: any) => {
     if (e.candidate) {
       const payload = {
-        target: otherUser.current,
+        receiver: otherUser.current,
         candidate: e.candidate,
       };
       socket.emit("ice_candidate", payload);
@@ -151,20 +153,20 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   function handleTrackEvent(e: any) {
-    partnerVideo.current.srcObject = e.streams[0];
-    setCallAccepted(true);
+    partnerVideoRef.current.srcObject = e.streams[0];
   }
 
   const pauseAudio = () => audio.pause();
 
   const initiateCall = (stream: any) => {
-    userVideo.current.srcObject = stream;
-    userStream.current = stream;
-    socket.emit("join_room", connectionId, receiverInfo.receiver_id);
+    userVideoRef.current.srcObject = stream;
+
+    socket.emit("join_room", { connectionId, receiverInfo });
   };
 
   const onPressVideo = (payload: any) => {
     receiverInfo = payload;
+
     connectionId = payload.connectionId;
     setCallInitiated(true);
   };
@@ -175,7 +177,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         <div style={{ position: "relative", backgroundColor: "black" }}>
           <div>
             <Video
-              ref={partnerVideo}
+              ref={partnerVideoRef}
               style={{ height: "100vh", width: "100vw" }}
             />
           </div>
@@ -187,7 +189,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
             }}
           >
             <Video
-              ref={userVideo}
+              ref={userVideoRef}
               myVideo
               initiateCall={initiateCall}
               style={{ height: 600, width: 300 }}
@@ -207,6 +209,13 @@ const VideoContextProvider = ({ children }: { children: any }) => {
               justifyContent: "center",
             }}
             onClick={() => {
+              userVideoRef.current.srcObject
+                .getTracks()
+                .forEach((track: any) => {
+                  track.enabled = false;
+                  track.stop();
+                });
+              userVideoRef.current = null;
               peerRef.current.close();
               setCallInitiated(false);
             }}
@@ -229,10 +238,10 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         onCancelPress={pauseAudio}
       >
         <div style={{ display: "flex", alignItems: "center" }}>
-          {/* <Avatar image={userRef.current?.image} />
+          <Avatar image={receiverInfo?.image} />
           <h3 style={{ textTransform: "capitalize", marginRight: 5 }}>
-            {userRef.current?.name}
-          </h3> */}
+            {receiverInfo?.name}
+          </h3>
           is Calling you
         </div>
       </CustomModal>

@@ -2,10 +2,16 @@ import { httpMethod } from "../../../api/httpMethodd";
 import { apiRoutes } from "../../../constants/apiRoutes";
 import { formatConnectionResponse } from "../../util/chat";
 
-export const geAllConnectionService = async (id: string) => {
+export const geAllConnectionService = async (
+  id: string,
+  connectionId: string
+) => {
   try {
     const response = await httpMethod.get(
-      apiRoutes.chat.users.getAllConnections.replace(":id", id)
+      apiRoutes.chat.users.getAllConnections.replace(":id", id),
+      {
+        params: { connectionId },
+      }
     );
     return formatConnectionResponse(response.data.data);
   } catch (error) {

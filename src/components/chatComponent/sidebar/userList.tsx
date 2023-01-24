@@ -19,7 +19,7 @@ const UserList = () => {
   const [users, setUsers] = useState<IUserProps[]>([]);
 
   const getUsers = () => {
-    geAllConnectionService(state.user._id).then((data) => {
+    geAllConnectionService(state.user._id, chatState.user._id).then((data) => {
       if (data?.length) {
         setUsers(data);
         dispatch({
