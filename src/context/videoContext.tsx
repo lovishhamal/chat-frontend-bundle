@@ -229,6 +229,15 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       )}
       <CustomModal
         ref={modalRef}
+        element={() => (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Avatar image={receiverInfo?.image} />
+            <h3 style={{ textTransform: "capitalize", marginRight: 5 }}>
+              {receiverInfo?.name}
+            </h3>
+            is Calling you
+          </div>
+        )}
         title='Video Call'
         okText='Answer'
         cancelText='Decline'
@@ -236,15 +245,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
           setCallInitiated(true);
         }}
         onCancelPress={pauseAudio}
-      >
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <Avatar image={receiverInfo?.image} />
-          <h3 style={{ textTransform: "capitalize", marginRight: 5 }}>
-            {receiverInfo?.name}
-          </h3>
-          is Calling you
-        </div>
-      </CustomModal>
+      />
     </VideoContext.Provider>
   );
 };

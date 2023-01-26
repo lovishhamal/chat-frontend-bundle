@@ -21,20 +21,19 @@ import { CustomModal, UploadPhoto } from "../../common";
 import AvatarComponent from "../../common/avatar";
 import { VideoContext } from "../../context/videoContext";
 import AddUserListModal from "./sidebar/addUserListModal";
+import HocComponent from "../../hoc/hoc";
 
 export const ChatBodyComponent = () => {
   const { socket, callUser } = useContext<any>(VideoContext);
+  const { state, dispatch } = useContext<any>(ChatContext);
+  const { state: authState } = useContext<any>(AuthContext);
 
-  const connectionId = useRef<string>("");
   const messagesEndRef = useRef<any>(null);
   const modalRef = useRef<any>(null);
   const inputRef = useRef<any>(null);
   const imageRef = useRef<any>(null);
-  const { state, dispatch } = useContext<any>(ChatContext);
-  const { state: authState } = useContext<any>(AuthContext);
-  const [showUploadFile, setShowUploadFile] = useState<boolean>(false);
 
-  const [open, setOpen] = useState<boolean>(false);
+  const [showUploadFile, setShowUploadFile] = useState<boolean>(false);
 
   useEffect(() => {
     socket.emit("new-user-add", authState.user?._id);
@@ -90,14 +89,20 @@ export const ChatBodyComponent = () => {
     inputRef.current.value = "";
   };
 
+  const closeModal = () => {
+    modalRef.current.closeModal();
+  };
+
   return (
     <>
-      <CustomModal ref={modalRef} title='Create a group' footer={false}>
-        <AddUserListModal
-          setOpen={setOpen}
-          connectionId={connectionId.current}
-        />
-      </CustomModal>
+      <CustomModal
+        ref={modalRef}
+        title='Create a group'
+        footer={false}
+        element={HocComponent(() => (
+          <AddUserListModal closeModal={closeModal} />
+        ))}
+      />
       <div style={{ width: "100%" }}>
         <div className={Styles.header}>
           <div style={{ display: "flex", alignItems: "center" }}>
@@ -109,10 +114,7 @@ export const ChatBodyComponent = () => {
           <div className={Styles.iconWrapper}>
             <div
               className={Styles.icon}
-              onClick={() => {
-                connectionId.current = state.user._id;
-                modalRef.current.openModal();
-              }}
+              onClick={() => modalRef.current.openModal(state.user._id)}
             >
               <PlusOutlined />
             </div>

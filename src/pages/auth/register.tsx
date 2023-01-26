@@ -7,6 +7,7 @@ import ImgCrop from "antd-img-crop";
 import { useState } from "react";
 import { registerService } from "../../services/auth";
 import { MainLayout } from "../../layout";
+import { showNotification } from "../../common";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -47,7 +48,9 @@ const RegisterPage = () => {
       .then((data) => {
         navigate(uiRoutes.auth.login);
       })
-      .catch((err) => {});
+      .catch((err) => {
+        showNotification({ type: "error", message: err.data?.message });
+      });
   };
 
   return (

@@ -1,6 +1,12 @@
 import { List } from "antd";
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { AuthContext, ChatContext } from "../../../context";
+import {
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
+import { AuthContext } from "../../../context";
 import { IUserProps } from "../../../interface/components/chat/chatInterface";
 import {
   createUserGroupService,
@@ -10,25 +16,18 @@ import { CheckCircleOutlined } from "@ant-design/icons";
 import Styles from "./addUserModal.module.css";
 import { ConnectionType } from "../../../enums/common";
 
-const AddUserListModal = ({
-  setOpen,
-  connectionId,
-}: {
-  setOpen: any;
-  connectionId: string;
-}) => {
+const AddUserListModal = (data: any) => {
   const inputRef = useRef<any>(null);
   const { state } = useContext<any>(AuthContext);
-  const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<IUserProps[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<any>([]);
 
   const getUsers = () => {
-    geAllConnectionService(state.user._id, connectionId).then((data) => {
-      if (data?.length) {
-        setUsers(data);
-      }
-    });
+    // geAllConnectionService(state.user._id, "").then((data) => {
+    //   if (data?.length) {
+    //     setUsers(data);
+    //   }
+    // });
   };
 
   useEffect(() => {
@@ -36,7 +35,6 @@ const AddUserListModal = ({
   }, []);
 
   const onCreate = () => {
-    setOpen(false);
     const payload = {
       userId: state.user._id,
       connectionsIds: selectedUserId,
@@ -48,6 +46,8 @@ const AddUserListModal = ({
       .then((data) => {})
       .catch((err) => {});
   };
+
+  console.log("props", data);
 
   return (
     <>
@@ -91,7 +91,7 @@ const AddUserListModal = ({
         }}
       />
       <div style={{ display: "flex" }}>
-        <div className={Styles.btnCancel} onClick={() => setOpen(false)}>
+        <div className={Styles.btnCancel} onClick={() => {}}>
           <p>Cancel</p>
         </div>
         <div style={{ margin: "0px 5px 0px 5px" }} />
