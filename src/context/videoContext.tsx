@@ -3,7 +3,7 @@ import { Avatar, CustomModal } from "../common";
 import { socketIo } from "../util/socket";
 import { AuthContext } from "./authContext";
 import Video from "../components/context/video";
-import { CloseOutlined } from "@ant-design/icons";
+import { CloseOutlined, VideoCameraOutlined } from "@ant-design/icons";
 
 export const VideoContext = createContext({});
 const socket = socketIo();
@@ -16,11 +16,12 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const audio = new Audio(
     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   );
+
+  const modalRef = useRef<any>(null);
   const userVideoRef = useRef<any>(null);
   const partnerVideoRef = useRef<any>(null);
   const peerRef = useRef<any>();
   const otherUser = useRef<any>();
-  const [open, setOpen] = useState<any>(false);
 
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
 
@@ -31,7 +32,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         if (state.user._id === receiver_info.receiver_id) {
           receiverInfo = receiver_info;
           connectionId = connection_id;
-          setOpen(true);
+          modalRef.current.openModal();
         }
       }
     );
@@ -171,6 +172,19 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     setCallInitiated(true);
   };
 
+  const onClickVideo = () => {
+    userVideoRef.current.srcObject.getTracks().forEach((track: any) => {
+      if (track.readyState === "live" && track.kind === "video") {
+        track.enabled = false;
+        track.stop();
+      } else {
+        if (track.readyState === "ended" && track.kind === "video") {
+          track.enabled = true;
+        }
+      }
+    });
+  };
+
   return (
     <VideoContext.Provider value={{ socket, callUser: onPressVideo }}>
       {callInitiated ? (
@@ -197,39 +211,60 @@ const VideoContextProvider = ({ children }: { children: any }) => {
           </div>
           <div
             style={{
+              display: "flex",
+              alignItems: "center",
               position: "absolute",
               bottom: 10,
               left: "50%",
-              backgroundColor: "red",
-              borderRadius: 100,
-              width: 50,
-              height: 50,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            onClick={() => {
-              userVideoRef.current.srcObject
-                .getTracks()
-                .forEach((track: any) => {
-                  track.enabled = false;
-                  track.stop();
-                });
-              userVideoRef.current = null;
-              peerRef.current.close();
-              setCallInitiated(false);
             }}
           >
-            <CloseOutlined style={{ color: "#ffffff" }} />
+            <div
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onClick={() => {
+                userVideoRef.current.srcObject
+                  .getTracks()
+                  .forEach((track: any) => {
+                    track.enabled = false;
+                    track.stop();
+                  });
+                userVideoRef.current = null;
+                peerRef.current.close();
+                setCallInitiated(false);
+              }}
+            >
+              <CloseOutlined style={{ color: "#ffffff" }} />
+            </div>
+            <span style={{ margin: "0px 2px 0px 2px" }} />
+            <div
+              onClick={onClickVideo}
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <VideoCameraOutlined style={{ color: "#ffffff" }} />
+            </div>
           </div>
         </div>
       ) : (
         children
       )}
       <CustomModal
+        ref={modalRef}
         title='Video Call'
-        open={open}
-        setOpen={setOpen}
         okText='Answer'
         cancelText='Decline'
         onOkPress={() => {
