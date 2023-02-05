@@ -95,14 +95,9 @@ export const ChatBodyComponent = () => {
 
   return (
     <>
-      <CustomModal
-        ref={modalRef}
-        title='Create a group'
-        footer={false}
-        element={HocComponent(() => (
-          <AddUserListModal closeModal={closeModal} />
-        ))}
-      />
+      <CustomModal ref={modalRef} title='Create a group' footer={false}>
+        <AddUserListModal closeModal={closeModal} />
+      </CustomModal>
       <div style={{ width: "100%" }}>
         <div className={Styles.header}>
           <div style={{ display: "flex", alignItems: "center" }}>

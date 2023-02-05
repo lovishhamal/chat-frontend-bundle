@@ -3,7 +3,7 @@ import { Avatar, CustomModal } from "../common";
 import { socketIo } from "../util/socket";
 import { AuthContext } from "./authContext";
 import Video from "../components/context/video";
-import { CloseOutlined } from "@ant-design/icons";
+import { CloseOutlined, VideoCameraOutlined } from "@ant-design/icons";
 
 export const VideoContext = createContext({});
 const socket = socketIo();
@@ -172,6 +172,19 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     setCallInitiated(true);
   };
 
+  const onClickVideo = () => {
+    userVideoRef.current.srcObject.getTracks().forEach((track: any) => {
+      if (track.readyState === "live" && track.kind === "video") {
+        track.enabled = false;
+        track.stop();
+      } else {
+        if (track.readyState === "ended" && track.kind === "video") {
+          track.enabled = true;
+        }
+      }
+    });
+  };
+
   return (
     <VideoContext.Provider value={{ socket, callUser: onPressVideo }}>
       {callInitiated ? (
@@ -198,30 +211,52 @@ const VideoContextProvider = ({ children }: { children: any }) => {
           </div>
           <div
             style={{
+              display: "flex",
+              alignItems: "center",
               position: "absolute",
               bottom: 10,
               left: "50%",
-              backgroundColor: "red",
-              borderRadius: 100,
-              width: 50,
-              height: 50,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            onClick={() => {
-              userVideoRef.current.srcObject
-                .getTracks()
-                .forEach((track: any) => {
-                  track.enabled = false;
-                  track.stop();
-                });
-              userVideoRef.current = null;
-              peerRef.current.close();
-              setCallInitiated(false);
             }}
           >
-            <CloseOutlined style={{ color: "#ffffff" }} />
+            <div
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onClick={() => {
+                userVideoRef.current.srcObject
+                  .getTracks()
+                  .forEach((track: any) => {
+                    track.enabled = false;
+                    track.stop();
+                  });
+                userVideoRef.current = null;
+                peerRef.current.close();
+                setCallInitiated(false);
+              }}
+            >
+              <CloseOutlined style={{ color: "#ffffff" }} />
+            </div>
+            <span style={{ margin: "0px 2px 0px 2px" }} />
+            <div
+              onClick={onClickVideo}
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <VideoCameraOutlined style={{ color: "#ffffff" }} />
+            </div>
           </div>
         </div>
       ) : (
@@ -229,15 +264,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       )}
       <CustomModal
         ref={modalRef}
-        element={() => (
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <Avatar image={receiverInfo?.image} />
-            <h3 style={{ textTransform: "capitalize", marginRight: 5 }}>
-              {receiverInfo?.name}
-            </h3>
-            is Calling you
-          </div>
-        )}
         title='Video Call'
         okText='Answer'
         cancelText='Decline'
@@ -245,7 +271,15 @@ const VideoContextProvider = ({ children }: { children: any }) => {
           setCallInitiated(true);
         }}
         onCancelPress={pauseAudio}
-      />
+      >
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Avatar image={receiverInfo?.image} />
+          <h3 style={{ textTransform: "capitalize", marginRight: 5 }}>
+            {receiverInfo?.name}
+          </h3>
+          is Calling you
+        </div>
+      </CustomModal>
     </VideoContext.Provider>
   );
 };

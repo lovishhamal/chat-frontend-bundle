@@ -1,12 +1,6 @@
 import { List } from "antd";
-import {
-  useContext,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react";
-import { AuthContext } from "../../../context";
+import { useContext, useEffect, useRef, useState } from "react";
+import { AuthContext, ChatContext } from "../../../context";
 import { IUserProps } from "../../../interface/components/chat/chatInterface";
 import {
   createUserGroupService,
@@ -18,27 +12,29 @@ import { ConnectionType } from "../../../enums/common";
 
 const AddUserListModal = (data: any) => {
   const inputRef = useRef<any>(null);
-  const { state } = useContext<any>(AuthContext);
+  const { state: authState } = useContext<any>(AuthContext);
+  const { state } = useContext<any>(ChatContext);
   const [users, setUsers] = useState<IUserProps[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<any>([]);
 
   const getUsers = () => {
-    // geAllConnectionService(state.user._id, "").then((data) => {
-    //   if (data?.length) {
-    //     setUsers(data);
-    //   }
-    // });
+    geAllConnectionService(authState.user._id, state.user_id).then((data) => {
+      if (data?.length) {
+        setUsers(data);
+      }
+    });
   };
 
   useEffect(() => {
-    getUsers();
-  }, []);
+    if (state?.user?._id) {
+      getUsers();
+    }
+  }, [state.user._id]);
 
   const onCreate = () => {
     const payload = {
-      userId: state.user._id,
-      connectionsIds: selectedUserId,
-      groupName: inputRef.current.value,
+      creatorId: authState.user._id,
+      connectionIds: selectedUserId,
       connectionType: ConnectionType.GROUP,
     };
 
@@ -46,8 +42,6 @@ const AddUserListModal = (data: any) => {
       .then((data) => {})
       .catch((err) => {});
   };
-
-  console.log("props", data);
 
   return (
     <>

@@ -6,14 +6,14 @@ const CustomModal = forwardRef(
     {
       title = "Modal",
       footer = true,
-      element,
+      children,
       okText = "Create",
       cancelText = "Cancel",
       onOkPress = () => {},
       onCancelPress = () => {},
     }: {
       title?: string;
-      element: any;
+      children: React.ReactNode;
       footer?: boolean;
       okText?: string;
       cancelText?: string;
@@ -52,7 +52,7 @@ const CustomModal = forwardRef(
         onCancel={() => closeModal(onCancelPress)}
         destroyOnClose
       >
-        {element}
+        {children}
       </Modal>
     );
   }

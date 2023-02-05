@@ -1,3 +1,4 @@
+/** may need in future */
 export const formatConnectionResponse = (response: any) => {
   const res = response.map((item: any) => {
     const userId = item._id;
@@ -10,5 +11,6 @@ export const formatConnectionResponse = (response: any) => {
       messageId: connection.messageId,
     };
   });
+
   return res;
 };
