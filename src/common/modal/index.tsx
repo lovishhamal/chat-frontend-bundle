@@ -1,20 +1,11 @@
 import { Modal } from "antd";
-import React, {
-  Dispatch,
-  forwardRef,
-  SetStateAction,
-  useImperativeHandle,
-  useState,
-} from "react";
-import AutoCompleteSearch from "../textSearch";
+import { forwardRef, useImperativeHandle, useState } from "react";
 
 const CustomModal = forwardRef(
   (
     {
       title = "Modal",
       footer = true,
-      open,
-      setOpen,
       children,
       okText = "Create",
       cancelText = "Cancel",
@@ -22,8 +13,6 @@ const CustomModal = forwardRef(
       onCancelPress = () => {},
     }: {
       title?: string;
-      open: boolean;
-      setOpen: Dispatch<SetStateAction<boolean>>;
       children: React.ReactNode;
       footer?: boolean;
       okText?: string;
@@ -33,22 +22,34 @@ const CustomModal = forwardRef(
     },
     ref
   ) => {
+    const [modal, setModal] = useState({ open: false, data: null });
+
+    useImperativeHandle(
+      ref,
+      () => {
+        return {
+          openModal: (data: any) => setModal({ ...modal, open: true, data }),
+          closeModal,
+        };
+      },
+      []
+    );
+
+    const closeModal = (callback: () => void = () => {}) => {
+      setModal({ open: false, data: null });
+      callback();
+    };
+
     return (
       <Modal
         title={title}
         cancelButtonProps={{ style: { display: footer ? "" : "none" } }}
         okButtonProps={{ style: { display: footer ? "" : "none" } }}
-        open={open}
+        open={modal.open}
         okText={okText}
         cancelText={cancelText}
-        onOk={() => {
-          setOpen(false);
-          onOkPress();
-        }}
-        onCancel={() => {
-          setOpen(false);
-          onCancelPress();
-        }}
+        onOk={() => closeModal(onOkPress)}
+        onCancel={() => closeModal(onCancelPress)}
         destroyOnClose
       >
         {children}

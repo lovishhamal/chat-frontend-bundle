@@ -13,6 +13,7 @@ export const geAllConnectionService = async (
         params: { connectionId },
       }
     );
+
     return formatConnectionResponse(response.data.data);
   } catch (error) {
     throw error;
