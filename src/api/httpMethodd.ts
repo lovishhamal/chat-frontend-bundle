@@ -17,7 +17,7 @@ export class httpMethod {
   }
   static async get(path: string, body?: any) {
     try {
-      const response = await baseRequest.get(path, body);
+      const response = await baseRequest.get(path, { params: body });
       return response;
     } catch (error) {
       throw error;

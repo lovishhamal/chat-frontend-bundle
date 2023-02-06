@@ -3,7 +3,7 @@ import { apiRoutes } from "../../../constants/apiRoutes";
 
 export const getMessageService = async (payload: any) => {
   try {
-    const response = await httpMethod.post(
+    const response = await httpMethod.get(
       apiRoutes.chat.messages.getAll,
       payload
     );
