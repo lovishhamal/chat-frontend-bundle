@@ -1,15 +1,13 @@
 import { useContext, useEffect, useRef } from "react";
-import { ChatContext } from "../../context/chatContext";
-import { SET_MESSAGE } from "../../constants/actions";
-import { AuthContext } from "../../context";
+import { ChatContext, AuthContext, VideoContext } from "../../context";
+import { SET_MESSAGE } from "../../constants";
 import { LocalStorage } from "../../util/localStorage";
 import { CustomModal } from "../../common";
-import { VideoContext } from "../../context/videoContext";
 import AddUserListModal from "./sidebar/addUserListModal";
 import ChatBoxComponent from "./chatBoxComponent";
 import ChatBoxHeaderComponent from "./chatBoxHeaderComponent";
-
 import ChatInputComponent from "./chatInputComponent";
+import Styles from "./chatBodyComponent.module.css";
 
 export const ChatBodyComponent = () => {
   const messagesEndRef = useRef<any>(null);
@@ -54,22 +52,8 @@ export const ChatBodyComponent = () => {
       <CustomModal ref={modalRef} title="Create a group" footer={false}>
         <AddUserListModal closeModal={closeModal} />
       </CustomModal>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          width: "100%",
-          justifyContent: "space-between",
-          marginBottom: 5,
-        }}
-      >
-        <div
-          style={{
-            justifySelf: "flex-start",
-            height: "100%",
-            overflow: "scroll",
-          }}
-        >
+      <div className={Styles.chatBoxWrapper}>
+        <div className={Styles.chatBoxBody}>
           <ChatBoxHeaderComponent modalRef={modalRef} />
           <ChatBoxComponent />
         </div>

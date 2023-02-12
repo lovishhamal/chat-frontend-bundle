@@ -5,8 +5,6 @@ import { ReceiverBoxComponent } from "./receiverBoxComponent";
 import { IMessage } from "../../interface/components/chat/chatInterface";
 import Styles from "./chatBodyComponent.module.css";
 import { AuthContext, ChatContext } from "../../context";
-import { VideoContext } from "../../context/videoContext";
-import { getCurrentDate } from "../../util/date";
 
 const ChatBoxComponent = () => {
   const { state } = useContext<any>(ChatContext);
