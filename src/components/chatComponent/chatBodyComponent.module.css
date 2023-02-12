@@ -22,9 +22,6 @@
   background-color: #fff;
 }
 
-/* .messageInputWrapper .overflow {
-  margin-top: -300px;
-} */
 
 .sendNewMessage {
   display: flex;
@@ -72,17 +69,17 @@
   transform: scale(0);
   transform-origin: right;
   animation-name: showIn;
-  animation-duration: 0.2s; /* or: Xms */
+  animation-duration: 0.2s; 
   animation-iteration-count: 1;
-  animation-direction: normal; /* or: normal */
+  animation-direction: normal;
   animation-timing-function: cubic-bezier(
     0.88,
     0.19,
     0.37,
     1.11
-  ); /* or: ease, ease-in, ease-in-out, linear, cubic-bezier(x1, y1, x2, y2) */
-  animation-fill-mode: both; /* or: backwards, both, none */
-  animation-delay: 0.2s; /* or: Xms */
+  ); 
+  animation-fill-mode: both; 
+  animation-delay: 0.2s; 
 }
 
 @keyframes showIn {
@@ -118,7 +115,7 @@
 
 .header {
   padding: 0px;
-  margin: 0px;
+  margin: 10px;
   display: flex;
   justify-content: space-between;
   background-color: #fff;
