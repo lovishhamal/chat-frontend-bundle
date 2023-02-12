@@ -8,6 +8,7 @@ import Styles from "./chatPage.module.css";
 
 const ChatPage = () => {
   const { state, dispatch } = ChatReducer();
+
   return (
     <ChatContext.Provider value={{ state, dispatch }}>
       <MainLayout>
