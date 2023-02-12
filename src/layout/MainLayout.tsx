@@ -1,4 +1,3 @@
-import React from "react";
 import Styles from "./MainLayout.module.css";
 
 const MainLayout = ({ children }: { children: any }) => {

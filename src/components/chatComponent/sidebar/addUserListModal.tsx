@@ -39,14 +39,18 @@ const AddUserListModal = (data: any) => {
     };
 
     createUserGroupService(payload)
-      .then((data) => {})
-      .catch((err) => {});
+      .then((data) => {
+        console.log("gg", data);
+      })
+      .catch((err) => {
+        console.log("err", err);
+      });
   };
 
   return (
     <>
       <List
-        itemLayout='horizontal'
+        itemLayout="horizontal"
         dataSource={users}
         renderItem={(item) => {
           return (
