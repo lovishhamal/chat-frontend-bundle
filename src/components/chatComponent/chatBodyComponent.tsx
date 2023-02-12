@@ -94,6 +94,7 @@ export const ChatBodyComponent = () => {
           flexDirection: "column",
           width: "100%",
           justifyContent: "space-between",
+          marginBottom: 5,
         }}
       >
         <div
