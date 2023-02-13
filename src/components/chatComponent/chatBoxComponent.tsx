@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext } from "react";
 import { List } from "antd";
 import { SenderBoxComponent } from "./senderBoxComponent";
 import { ReceiverBoxComponent } from "./receiverBoxComponent";
@@ -9,8 +9,6 @@ import { AuthContext, ChatContext } from "../../context";
 const ChatBoxComponent = () => {
   const { state } = useContext<any>(ChatContext);
   const { state: authState } = useContext<any>(AuthContext);
-
-  const messagesEndRef = useRef<any>(null);
 
   return (
     <div className={Styles.mainChatContent}>
@@ -27,7 +25,6 @@ const ChatBoxComponent = () => {
                 ) : (
                   <ReceiverBoxComponent item={item} />
                 )}
-                <div ref={messagesEndRef} />
               </>
             );
           }}
