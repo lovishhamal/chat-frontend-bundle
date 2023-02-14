@@ -120,6 +120,9 @@
   padding: 0px 10px 0px 10px;
   border-radius: 5px;
   margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .icon {
