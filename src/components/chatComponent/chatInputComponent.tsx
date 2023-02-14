@@ -45,6 +45,8 @@ const ChatInputComponent = ({
     };
     socket.emit("send_message", body);
     inputRef.current.value = "";
+    imageRef.current = "";
+    setShowUploadFile(false);
   };
 
   return (
