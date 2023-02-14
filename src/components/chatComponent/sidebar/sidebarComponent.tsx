@@ -29,12 +29,18 @@ export const SideBarComponent = () => {
           width: 300,
         }}
       >
+        <div style={{ marginTop: 20 }}>
+          Hi{" "}
+          <span style={{ textTransform: "capitalize" }}>
+            {state.user.userName}
+          </span>
+        </div>
         <h2>Recent Chats</h2>
         <div className={Styles.chatListSearch}>
           <div className={Styles.searchWrap}>
             <input
-              type='text'
-              placeholder='Search Here'
+              type="text"
+              placeholder="Search Here"
               required
               onChange={onChange}
             />

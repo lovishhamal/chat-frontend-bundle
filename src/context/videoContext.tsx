@@ -3,7 +3,11 @@ import { Avatar, CustomModal } from "../common";
 import { socketIo } from "../util/socket";
 import { AuthContext } from "./authContext";
 import Video from "../components/context/video";
-import { CloseOutlined, VideoCameraOutlined } from "@ant-design/icons";
+import {
+  CloseOutlined,
+  VideoCameraOutlined,
+  PlaySquareOutlined,
+} from "@ant-design/icons";
 
 export const VideoContext = createContext({});
 const socket = socketIo();
@@ -84,6 +88,8 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const handleNegotiationNeededEvent = (userId: any) => {
+    console.log("negtiation needed");
+
     peerRef.current
       .createOffer()
       .then((offer: any) => {
@@ -154,6 +160,8 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   function handleTrackEvent(e: any) {
+    console.log("trakc called", e);
+
     partnerVideoRef.current.srcObject = e.streams[0];
   }
 
@@ -161,7 +169,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const initiateCall = (stream: any) => {
     userVideoRef.current.srcObject = stream;
-
     socket.emit("join_room", { connectionId, receiverInfo });
   };
 
@@ -173,15 +180,35 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const onClickVideo = () => {
-    userVideoRef.current.srcObject.getTracks().forEach((track: any) => {
-      if (track.readyState === "live" && track.kind === "video") {
-        track.enabled = false;
-        track.stop();
-      } else {
-        if (track.readyState === "ended" && track.kind === "video") {
-          track.enabled = true;
-        }
-      }
+    const senders = peerRef.current.getSenders();
+    senders.forEach((sender: any) => peerRef.current.removeTrack(sender));
+    // userVideoRef.current.srcObject.removeTrack(prevTracks[0]);
+    // peerRef.current.removeTrack(prevTracks[0]);
+  };
+
+  const resumeVdo = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        console.log("track", currentStream.getVideoTracks()[0]);
+
+        peerRef.current.addTrack(currentStream.getVideoTracks()[0]);
+      });
+  };
+
+  const screenShare = () => {
+    navigator.mediaDevices.getDisplayMedia().then((stream) => {
+      const prevVideoTrack = userVideoRef.current.srcObject.getVideoTracks();
+      const currentVideoTrack = stream.getVideoTracks();
+
+      userVideoRef.current.srcObject.removeTrack(prevVideoTrack[0]);
+      userVideoRef.current.srcObject.addTrack(currentVideoTrack[0]);
+      console.log("cc", userVideoRef.current.srcObject);
+
+      stream.getTracks().forEach((track: any) => {
+        console.log("track", track);
+        peerRef.current.addTrack(track, userVideoRef.current.srcObject);
+      });
     });
   };
 
@@ -257,6 +284,20 @@ const VideoContextProvider = ({ children }: { children: any }) => {
             >
               <VideoCameraOutlined style={{ color: "#ffffff" }} />
             </div>
+            <div
+              onClick={screenShare}
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <PlaySquareOutlined style={{ color: "#ffffff" }} />
+            </div>
           </div>
         </div>
       ) : (
@@ -264,9 +305,9 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       )}
       <CustomModal
         ref={modalRef}
-        title='Video Call'
-        okText='Answer'
-        cancelText='Decline'
+        title="Video Call"
+        okText="Answer"
+        cancelText="Decline"
         onOkPress={() => {
           setCallInitiated(true);
         }}

@@ -15,6 +15,7 @@ const UserList = () => {
   const { state } = useContext<any>(AuthContext);
   const { state: chatState, dispatch } = useContext<any>(ChatContext);
 
+
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<IUserProps[]>([]);
 
@@ -73,7 +74,7 @@ const UserList = () => {
       next={loadMoreData}
       hasMore={users?.length < 0 || false}
       loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
-      scrollableTarget='scrollableDiv'
+      scrollableTarget="scrollableDiv"
     >
       <List
         dataSource={users}
