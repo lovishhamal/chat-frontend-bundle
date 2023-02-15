@@ -198,17 +198,15 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const screenShare = () => {
     navigator.mediaDevices.getDisplayMedia().then((stream) => {
-      const prevVideoTrack = userVideoRef.current.srcObject.getVideoTracks();
-      const currentVideoTrack = stream.getVideoTracks();
-
-      userVideoRef.current.srcObject.removeTrack(prevVideoTrack[0]);
-      userVideoRef.current.srcObject.addTrack(currentVideoTrack[0]);
-      console.log("cc", userVideoRef.current.srcObject);
-
-      stream.getTracks().forEach((track: any) => {
-        console.log("track", track);
-        peerRef.current.addTrack(track, userVideoRef.current.srcObject);
+      let videoTrack = stream.getVideoTracks()[0];
+      const senders = peerRef.current.getSenders();
+      var sender = senders.find(function (s: any) {
+        return s.track.kind == videoTrack.kind;
       });
+      sender.replaceTrack(videoTrack);
+      videoTrack.onended = function () {
+        sender.replaceTrack(stream.getTracks()[1]);
+      };
     });
   };
 
