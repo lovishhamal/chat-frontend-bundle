@@ -15,6 +15,7 @@ const socket = socketIo();
 let receiverInfo: any = {};
 let connectionId: string = "";
 
+let videoPaused = false;
 const VideoContextProvider = ({ children }: { children: any }) => {
   const { state } = useContext<any>(AuthContext);
   const audio = new Audio(
@@ -26,7 +27,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const partnerVideoRef = useRef<any>(null);
   const peerRef = useRef<any>();
   const otherUser = useRef<any>();
-
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
 
   useEffect(() => {
@@ -88,8 +88,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const handleNegotiationNeededEvent = (userId: any) => {
-    console.log("negtiation needed");
-
     peerRef.current
       .createOffer()
       .then((offer: any) => {
@@ -160,8 +158,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   function handleTrackEvent(e: any) {
-    console.log("trakc called", e);
-
     partnerVideoRef.current.srcObject = e.streams[0];
   }
 
@@ -180,8 +176,20 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const onClickVideo = () => {
-    const senders = peerRef.current.getSenders();
-    senders.forEach((sender: any) => peerRef.current.removeTrack(sender));
+    videoPaused = !videoPaused;
+    if (videoPaused) {
+      const senders = peerRef.current.getSenders();
+      userVideoRef.current.srcObject.getTracks().forEach((track: any) => {
+        track.enabled = false;
+        track.stop();
+        var sender = senders.find(function (s: any) {
+          return s.track.kind == track.kind;
+        });
+        sender.replaceTrack(track);
+      });
+    } else {
+      resumeVdo();
+    }
     // userVideoRef.current.srcObject.removeTrack(prevTracks[0]);
     // peerRef.current.removeTrack(prevTracks[0]);
   };
@@ -189,10 +197,16 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const resumeVdo = () => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        console.log("track", currentStream.getVideoTracks()[0]);
-
-        peerRef.current.addTrack(currentStream.getVideoTracks()[0]);
+      .then((stream) => {
+        let videoTrack = stream.getVideoTracks()[0];
+        const senders = peerRef.current.getSenders();
+        var sender = senders.find(function (s: any) {
+          return s.track.kind == videoTrack.kind;
+        });
+        sender.replaceTrack(videoTrack);
+        // videoTrack.onended = function () {
+        //   sender.replaceTrack(stream.getTracks()[1]);
+        // };
       });
   };
 
@@ -204,9 +218,9 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         return s.track.kind == videoTrack.kind;
       });
       sender.replaceTrack(videoTrack);
-      videoTrack.onended = function () {
-        sender.replaceTrack(stream.getTracks()[1]);
-      };
+      // videoTrack.onended = function () {
+      //   sender.replaceTrack(stream.getTracks()[1]);
+      // };
     });
   };
 
@@ -269,7 +283,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
             </div>
             <span style={{ margin: "0px 2px 0px 2px" }} />
             <div
-              onClick={onClickVideo}
+              onClick={() => onClickVideo()}
               style={{
                 backgroundColor: "red",
                 borderRadius: 100,
