@@ -10,12 +10,24 @@
   width: 100%;
   justify-content: space-between;
   margin-bottom: 5px;
+   -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.chatBoxWrapper::-webkit-scrollbar {
+  display: none;
 }
 
 .chatBoxBody {
   justify-self: flex-start;
   height: 100%;
   overflow: scroll;
+   -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.chatBoxBody::-webkit-scrollbar{
+ display: none;
 }
 
 .contentFooter {
