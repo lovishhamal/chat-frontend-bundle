@@ -2,7 +2,23 @@
   padding: 10px 10px;
   border-right: 1px solid #ebe7fb;
   padding-left: 0px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+
+.mainChatContent::-webkit-scrollbar{
+ display: none;
+}
+
+.list {
+   -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.list::-webkit-scrollbar{
+ display: none;
+}
+
 
 .chatBoxWrapper {
   display: flex;
@@ -10,19 +26,15 @@
   width: 100%;
   justify-content: space-between;
   margin-bottom: 5px;
-   -ms-overflow-style: none;
-  scrollbar-width: none;
 }
 
-.chatBoxWrapper::-webkit-scrollbar {
-  display: none;
-}
+
 
 .chatBoxBody {
   justify-self: flex-start;
   height: 100%;
   overflow: scroll;
-   -ms-overflow-style: none;
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
 

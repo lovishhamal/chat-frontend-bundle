@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 
 // remove this in production
 
-let c = 0;
+
 const Video = React.forwardRef((props: any, ref: any) => {
+  let c = 0;
   useEffect(() => {
     if (props.myVideo && !c) {
       c++;

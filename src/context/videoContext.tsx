@@ -9,6 +9,7 @@ import {
   PlaySquareOutlined,
 } from "@ant-design/icons";
 
+
 export const VideoContext = createContext({});
 const socket = socketIo();
 
@@ -55,6 +56,11 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     socket.on("answer", handleAnswer);
 
     socket.on("ice_candidate", handleNewICECandidateMsg);
+
+    socket.on("call_ended", (payload) => {
+      setCallInitiated(false);
+      partnerVideoRef.current = null;
+    });
   }, []);
 
   const createPeer = (userID?: any) => {
@@ -94,11 +100,14 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         return peerRef.current.setLocalDescription(offer);
       })
       .then(() => {
+        console.log("offfer created");
+
         const payload = {
           receiver: userId,
           caller: socket.id,
           sdp: peerRef.current.localDescription,
         };
+
         socket.emit("offer", payload);
       })
       .catch((e: any) => console.log(e));
@@ -110,11 +119,9 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     peerRef.current
       .setRemoteDescription(desc)
       .then(() => {
-        userVideoRef.current.srcObject
-          .getTracks()
-          .forEach((track: any) =>
-            peerRef.current.addTrack(track, userVideoRef.current.srcObject)
-          );
+        userVideoRef.current.srcObject.getTracks().forEach((track: any) => {
+          peerRef.current.addTrack(track, userVideoRef.current.srcObject);
+        });
       })
       .then(() => {
         return peerRef.current.createAnswer();
@@ -274,9 +281,9 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                     track.enabled = false;
                     track.stop();
                   });
-                userVideoRef.current = null;
                 peerRef.current.close();
                 setCallInitiated(false);
+                socket.emit("call_ended", { connectionId });
               }}
             >
               <CloseOutlined style={{ color: "#ffffff" }} />

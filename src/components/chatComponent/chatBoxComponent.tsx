@@ -15,6 +15,7 @@ const ChatBoxComponent = () => {
       <div>
         <List
           style={{ width: "100%", overflow: "scroll", zIndex: 0 }}
+          className={Styles.list}
           itemLayout="horizontal"
           dataSource={state.messages}
           renderItem={(item: IMessage) => {
