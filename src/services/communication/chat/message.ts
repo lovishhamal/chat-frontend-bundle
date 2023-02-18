@@ -1,4 +1,4 @@
-import { httpMethod } from "../../../api/httpMethodd";
+import { httpMethod } from "../../../api/httpMethod";
 import { apiRoutes } from "../../../constants/apiRoutes";
 
 export const getMessageService = async (payload: any) => {

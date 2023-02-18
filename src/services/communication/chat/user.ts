@@ -1,4 +1,4 @@
-import { httpMethod } from "../../../api/httpMethodd";
+import { httpMethod } from "../../../api/httpMethod";
 import { apiRoutes } from "../../../constants/apiRoutes";
 import { formatConnectionResponse } from "../../util/chat";
 
