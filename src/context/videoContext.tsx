@@ -3,7 +3,11 @@ import { Avatar, CustomModal } from "../common";
 import { socketIo } from "../util/socket";
 import { AuthContext } from "./authContext";
 import Video from "../components/context/video";
-import { CloseOutlined, VideoCameraOutlined } from "@ant-design/icons";
+import {
+  CloseOutlined,
+  VideoCameraOutlined,
+  PlaySquareOutlined,
+} from "@ant-design/icons";
 
 export const VideoContext = createContext({});
 const socket = socketIo();
@@ -11,6 +15,7 @@ const socket = socketIo();
 let receiverInfo: any = {};
 let connectionId: string = "";
 
+let videoPaused = false;
 const VideoContextProvider = ({ children }: { children: any }) => {
   const { state } = useContext<any>(AuthContext);
   const audio = new Audio(
@@ -22,7 +27,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const partnerVideoRef = useRef<any>(null);
   const peerRef = useRef<any>();
   const otherUser = useRef<any>();
-
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
 
   useEffect(() => {
@@ -161,7 +165,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const initiateCall = (stream: any) => {
     userVideoRef.current.srcObject = stream;
-
     socket.emit("join_room", { connectionId, receiverInfo });
   };
 
@@ -173,15 +176,51 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const onClickVideo = () => {
-    userVideoRef.current.srcObject.getTracks().forEach((track: any) => {
-      if (track.readyState === "live" && track.kind === "video") {
+    videoPaused = !videoPaused;
+    if (videoPaused) {
+      const senders = peerRef.current.getSenders();
+      userVideoRef.current.srcObject.getTracks().forEach((track: any) => {
         track.enabled = false;
         track.stop();
-      } else {
-        if (track.readyState === "ended" && track.kind === "video") {
-          track.enabled = true;
-        }
-      }
+        var sender = senders.find(function (s: any) {
+          return s.track.kind == track.kind;
+        });
+        sender.replaceTrack(track);
+      });
+    } else {
+      resumeVdo();
+    }
+    // userVideoRef.current.srcObject.removeTrack(prevTracks[0]);
+    // peerRef.current.removeTrack(prevTracks[0]);
+  };
+
+  const resumeVdo = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((stream) => {
+        let videoTrack = stream.getVideoTracks()[0];
+        const senders = peerRef.current.getSenders();
+        var sender = senders.find(function (s: any) {
+          return s.track.kind == videoTrack.kind;
+        });
+        sender.replaceTrack(videoTrack);
+        // videoTrack.onended = function () {
+        //   sender.replaceTrack(stream.getTracks()[1]);
+        // };
+      });
+  };
+
+  const screenShare = () => {
+    navigator.mediaDevices.getDisplayMedia().then((stream) => {
+      let videoTrack = stream.getVideoTracks()[0];
+      const senders = peerRef.current.getSenders();
+      var sender = senders.find(function (s: any) {
+        return s.track.kind == videoTrack.kind;
+      });
+      sender.replaceTrack(videoTrack);
+      // videoTrack.onended = function () {
+      //   sender.replaceTrack(stream.getTracks()[1]);
+      // };
     });
   };
 
@@ -244,7 +283,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
             </div>
             <span style={{ margin: "0px 2px 0px 2px" }} />
             <div
-              onClick={onClickVideo}
+              onClick={() => onClickVideo()}
               style={{
                 backgroundColor: "red",
                 borderRadius: 100,
@@ -257,6 +296,20 @@ const VideoContextProvider = ({ children }: { children: any }) => {
             >
               <VideoCameraOutlined style={{ color: "#ffffff" }} />
             </div>
+            <div
+              onClick={screenShare}
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <PlaySquareOutlined style={{ color: "#ffffff" }} />
+            </div>
           </div>
         </div>
       ) : (
@@ -264,9 +317,9 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       )}
       <CustomModal
         ref={modalRef}
-        title='Video Call'
-        okText='Answer'
-        cancelText='Decline'
+        title="Video Call"
+        okText="Answer"
+        cancelText="Decline"
         onOkPress={() => {
           setCallInitiated(true);
         }}
