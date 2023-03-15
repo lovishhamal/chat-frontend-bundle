@@ -8,6 +8,7 @@ import ChatBoxComponent from "./chatBoxComponent";
 import ChatBoxHeaderComponent from "./chatBoxHeaderComponent";
 import ChatInputComponent from "./chatInputComponent";
 import Styles from "./chatBodyComponent.module.css";
+import UserTypingStatus from "./userTypingStatus";
 
 export const ChatBodyComponent = () => {
   const messagesEndRef = useRef<any>(null);
@@ -56,6 +57,7 @@ export const ChatBodyComponent = () => {
         <div className={Styles.chatBoxBody}>
           <ChatBoxHeaderComponent modalRef={modalRef} />
           <ChatBoxComponent />
+          <UserTypingStatus socket={socket} userId={authState.user._id} />
           <div ref={messagesEndRef} />
         </div>
         <ChatInputComponent socket={socket} authState={authState} />

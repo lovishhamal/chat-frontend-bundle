@@ -3,7 +3,7 @@ import axios from "axios";
 export const jack = "";
 
 export const baseRequest = axios.create({
-  baseURL: "https://chat-backed.onrender.com/api",
+  baseURL: "http://localhost:5000/api",
 });
 
 export class httpMethod {

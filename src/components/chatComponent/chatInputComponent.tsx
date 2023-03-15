@@ -20,11 +20,13 @@ const ChatInputComponent = ({
   const [showUploadFile, setShowUploadFile] = useState<boolean>(false);
 
   const onClickSend = () => {
+    const messagetext = inputRef.current.value;
+    if (!messagetext) return;
     let message: any = {
       connectionId: state?.user.connectionId,
       sentBy: authState.user?._id,
       sentTo: state.user._id,
-      text: inputRef.current.value,
+      text: messagetext,
       updatedAt: getCurrentDate(),
     };
     if (imageRef.current) {
@@ -49,6 +51,14 @@ const ChatInputComponent = ({
     setShowUploadFile(false);
   };
 
+  const onChangeInput = () => {
+    socket.emit("user-input", {
+      connectionId: state?.user.connectionId,
+      firstName: authState.user.firstName,
+      id: authState.user?._id,
+    });
+  };
+
   return (
     <div className={Styles.messageInputWrapper}>
       {showUploadFile && (
@@ -66,7 +76,17 @@ const ChatInputComponent = ({
         >
           {showUploadFile ? <CloseOutlined /> : <PlusOutlined />}
         </button>
-        <input type="text" placeholder="Type a message here" ref={inputRef} />
+        <input
+          type="text"
+          placeholder="Type a message here"
+          ref={inputRef}
+          onChange={onChangeInput}
+          onKeyDown={(e: any) => {
+            if (e?.code === "Enter") {
+              onClickSend();
+            }
+          }}
+        />
         <button className="btnSendMsg" id="sendMsgBtn" onClick={onClickSend}>
           <SendOutlined />
         </button>
