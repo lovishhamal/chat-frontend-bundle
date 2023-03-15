@@ -43,3 +43,11 @@ export interface TypingStatus {
   id?: string;
   isTyping?: boolean;
 }
+
+export interface CallerInfo {
+  connectionId?: string;
+  receiver_id?: string;
+  caller_id?: string;
+  name?: string;
+  image?: string;
+}

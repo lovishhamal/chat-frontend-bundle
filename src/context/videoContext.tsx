@@ -8,12 +8,10 @@ import {
   VideoCameraOutlined,
   PlaySquareOutlined,
 } from "@ant-design/icons";
-
+import { CallerInfo } from "../interface/components/chat/chatInterface";
 
 export const VideoContext = createContext({});
 const socket = socketIo();
-
-let receiverInfo: any = {};
 let connectionId: string = "";
 
 let videoPaused = false;
@@ -29,13 +27,15 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const peerRef = useRef<any>();
   const otherUser = useRef<any>();
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
+  const [receiverInfo, setReceiverInfo] = useState<CallerInfo>({});
 
   useEffect(() => {
     socket.on(
       "call_user",
       ({ connectionId: connection_id, receiverInfo: receiver_info }) => {
         if (state.user._id === receiver_info.receiver_id) {
-          receiverInfo = receiver_info;
+          console.log("receiver_info.receiver_id -> ", receiver_info);
+          setReceiverInfo(receiver_info);
           connectionId = connection_id;
           modalRef.current.openModal();
         }
@@ -168,7 +168,10 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     partnerVideoRef.current.srcObject = e.streams[0];
   }
 
-  const pauseAudio = () => audio.pause();
+  const pauseAudio = () => {
+    endCall();
+    audio.pause();
+  };
 
   const initiateCall = (stream: any) => {
     userVideoRef.current.srcObject = stream;
@@ -176,7 +179,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const onPressVideo = (payload: any) => {
-    receiverInfo = payload;
+    setReceiverInfo(payload);
 
     connectionId = payload.connectionId;
     setCallInitiated(true);
@@ -231,6 +234,10 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     });
   };
 
+  const endCall = () => {
+    socket.emit("call_ended", { connectionId });
+  };
+
   return (
     <VideoContext.Provider value={{ socket, callUser: onPressVideo }}>
       {callInitiated ? (
@@ -283,7 +290,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                   });
                 peerRef.current.close();
                 setCallInitiated(false);
-                socket.emit("call_ended", { connectionId });
+                endCall();
               }}
             >
               <CloseOutlined style={{ color: "#ffffff" }} />

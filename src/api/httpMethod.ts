@@ -1,9 +1,7 @@
 import axios from "axios";
 
-export const jack = "";
-
 export const baseRequest = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: `${process.env.REACT_APP_API_URI}/api`,
 });
 
 export class httpMethod {
