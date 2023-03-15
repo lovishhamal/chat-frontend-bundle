@@ -57,7 +57,6 @@ export const ChatBodyComponent = () => {
         <div className={Styles.chatBoxBody}>
           <ChatBoxHeaderComponent modalRef={modalRef} />
           <ChatBoxComponent />
-          <UserTypingStatus socket={socket} userId={authState.user._id} />
           <div ref={messagesEndRef} />
         </div>
         <ChatInputComponent socket={socket} authState={authState} />

@@ -36,3 +36,10 @@ interface IImage {
   data: string;
   type: string;
 }
+
+export interface TypingStatus {
+  connectionId?: string;
+  firstName?: string;
+  id?: string;
+  isTyping?: boolean;
+}

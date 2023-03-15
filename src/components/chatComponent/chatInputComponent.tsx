@@ -1,11 +1,13 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { UploadPhoto } from "../../common";
 import { Divider } from "antd";
 import Styles from "./chatBodyComponent.module.css";
 import { getCurrentDate } from "../../util/date";
 import { SendOutlined, PlusOutlined, CloseOutlined } from "@ant-design/icons";
 import { ChatContext } from "../../context";
+import UserTypingStatus from "./userTypingStatus";
 
+let isUserTyping = false;
 const ChatInputComponent = ({
   socket,
   authState,
@@ -18,6 +20,35 @@ const ChatInputComponent = ({
 
   const { state } = useContext<any>(ChatContext);
   const [showUploadFile, setShowUploadFile] = useState<boolean>(false);
+  const [typingTimer, setTypingTimer] = useState<any>(null);
+  const doneTypingInterval = 2000;
+
+  useEffect(() => {
+    // event handler for keyup events on the input field
+    const handleKeyUp = () => {
+      clearTimeout(typingTimer);
+
+      // start a new timer with a delay of 2 seconds
+      setTypingTimer(
+        setTimeout(() => {
+          socket.emit("user-input", {
+            connectionId: state?.user.connectionId,
+            firstName: authState.user.firstName,
+            id: authState.user?._id,
+            typing: false,
+          });
+        }, doneTypingInterval)
+      );
+    };
+
+    const inputField: any = document.getElementById("myInput");
+    inputField.addEventListener("keyup", handleKeyUp);
+
+    // clean up the event listener when the component unmounts
+    return () => {
+      inputField.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [typingTimer]);
 
   const onClickSend = () => {
     const messagetext = inputRef.current.value;
@@ -52,46 +83,59 @@ const ChatInputComponent = ({
   };
 
   const onChangeInput = () => {
-    socket.emit("user-input", {
-      connectionId: state?.user.connectionId,
-      firstName: authState.user.firstName,
-      id: authState.user?._id,
-    });
+    if (!isUserTyping) {
+      socket.emit("user-input", {
+        connectionId: state?.user.connectionId,
+        firstName: authState.user.firstName,
+        id: authState.user?._id,
+        isTyping: true,
+      });
+    }
   };
 
   return (
-    <div className={Styles.messageInputWrapper}>
-      {showUploadFile && (
-        <div>
-          <UploadPhoto
-            handleChange={(item: any) => (imageRef.current = item)}
+    <>
+      <UserTypingStatus
+        socket={socket}
+        userId={authState.user._id}
+        onUserStoppedTyping={(typing: boolean) => {
+          isUserTyping = typing;
+        }}
+      />
+      <div className={Styles.messageInputWrapper}>
+        {showUploadFile && (
+          <div>
+            <UploadPhoto
+              handleChange={(item: any) => (imageRef.current = item)}
+            />
+            <Divider />
+          </div>
+        )}
+        <div className={Styles.sendNewMessage}>
+          <button
+            className="addFiles"
+            onClick={() => setShowUploadFile(!showUploadFile)}
+          >
+            {showUploadFile ? <CloseOutlined /> : <PlusOutlined />}
+          </button>
+          <input
+            id="myInput"
+            type="text"
+            placeholder="Type a message here"
+            ref={inputRef}
+            onChange={onChangeInput}
+            onKeyDown={(e: any) => {
+              if (e?.code === "Enter") {
+                onClickSend();
+              }
+            }}
           />
-          <Divider />
+          <button className="btnSendMsg" id="sendMsgBtn" onClick={onClickSend}>
+            <SendOutlined />
+          </button>
         </div>
-      )}
-      <div className={Styles.sendNewMessage}>
-        <button
-          className="addFiles"
-          onClick={() => setShowUploadFile(!showUploadFile)}
-        >
-          {showUploadFile ? <CloseOutlined /> : <PlusOutlined />}
-        </button>
-        <input
-          type="text"
-          placeholder="Type a message here"
-          ref={inputRef}
-          onChange={onChangeInput}
-          onKeyDown={(e: any) => {
-            if (e?.code === "Enter") {
-              onClickSend();
-            }
-          }}
-        />
-        <button className="btnSendMsg" id="sendMsgBtn" onClick={onClickSend}>
-          <SendOutlined />
-        </button>
       </div>
-    </div>
+    </>
   );
 };
 
