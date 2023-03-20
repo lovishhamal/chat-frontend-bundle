@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-// remove this in production
-
+// remove this in production c=0 and related code
 
 const Video = React.forwardRef((props: any, ref: any) => {
   let c = 0;
