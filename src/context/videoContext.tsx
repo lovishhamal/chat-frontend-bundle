@@ -28,6 +28,9 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const otherUser = useRef<any>();
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
   const [receiverInfo, setReceiverInfo] = useState<CallerInfo>({});
+  const [remoteTrackMuted, setRemoteTrackMuted] = useState<boolean>(false);
+  const [remoteVideo, setRemoteVideo] = useState(null);
+  const [videoPausedSuccess, setVideoPausedSuccess] = useState(false);
 
   useEffect(() => {
     socket.on(
@@ -61,7 +64,15 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       setCallInitiated(false);
       partnerVideoRef.current = null;
     });
+
+    socket.on("video_paused", (data: any) => {});
   }, []);
+
+  useEffect(() => {
+    if (remoteVideo) {
+      partnerVideoRef.current.srcObject = remoteVideo;
+    }
+  }, [remoteVideo]);
 
   const createPeer = (userID?: any) => {
     const peer = new RTCPeerConnection({
@@ -100,8 +111,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         return peerRef.current.setLocalDescription(offer);
       })
       .then(() => {
-        console.log("offfer created");
-
         const payload = {
           receiver: userId,
           caller: socket.id,
@@ -165,7 +174,16 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   function handleTrackEvent(e: any) {
-    partnerVideoRef.current.srcObject = e.streams[0];
+    e.track.addEventListener("mute", () => {
+      setRemoteVideo(null);
+      setRemoteTrackMuted(true);
+      socket.emit("video_paused", { userId: state.user._id });
+    });
+
+    e.track.addEventListener("unmute", () => {
+      setRemoteVideo(e.streams[0]);
+      setRemoteTrackMuted(false);
+    });
   }
 
   const pauseAudio = () => {
@@ -243,10 +261,24 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       {callInitiated ? (
         <div style={{ position: "relative", backgroundColor: "black" }}>
           <div>
-            <Video
-              ref={partnerVideoRef}
-              style={{ height: "100vh", width: "100vw" }}
-            />
+            {remoteTrackMuted ? (
+              <div
+                style={{
+                  height: "100vh",
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <img src={receiverInfo.image} />
+              </div>
+            ) : (
+              <Video
+                ref={partnerVideoRef}
+                style={{ height: "100vh", width: "100vw" }}
+              />
+            )}
           </div>
           <div
             style={{
