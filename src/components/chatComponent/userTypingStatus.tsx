@@ -3,13 +3,13 @@ import { TypingStatus } from "../../interface/components/chat/chatInterface";
 
 const UserTypingStatus = ({ socket, userId, onUserStoppedTyping }: any) => {
   const messagesEndRef = useRef<any>(null);
-  const [typingInfo, settypingInfo] = useState<TypingStatus>({});
+  const [typingInfo, setTypingInfo] = useState<TypingStatus>({});
 
   useEffect(() => {
     socket.on("user-input", (data: any) => {
-      onUserStoppedTyping(data.isTyping);
+      onUserStoppedTyping(data);
       if (data.id !== userId) {
-        settypingInfo(data);
+        setTypingInfo(data);
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       }
     });

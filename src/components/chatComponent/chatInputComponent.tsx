@@ -7,7 +7,6 @@ import { SendOutlined, PlusOutlined, CloseOutlined } from "@ant-design/icons";
 import { ChatContext } from "../../context";
 import UserTypingStatus from "./userTypingStatus";
 
-let isUserTyping = false;
 const ChatInputComponent = ({
   socket,
   authState,
@@ -21,6 +20,7 @@ const ChatInputComponent = ({
   const { state } = useContext<any>(ChatContext);
   const [showUploadFile, setShowUploadFile] = useState<boolean>(false);
   const [typingTimer, setTypingTimer] = useState<any>(null);
+  const userTypingInfo = useRef<any>({ isTyping: false });
   const doneTypingInterval = 2000;
 
   useEffect(() => {
@@ -53,6 +53,7 @@ const ChatInputComponent = ({
   const onClickSend = () => {
     const messagetext = inputRef.current.value;
     if (!messagetext) return;
+
     let message: any = {
       connectionId: state?.user.connectionId,
       sentBy: authState.user?._id,
@@ -76,6 +77,12 @@ const ChatInputComponent = ({
       connectionId: state?.user.connectionId,
       message,
     };
+    socket.emit("user-input", {
+      connectionId: state?.user.connectionId,
+      firstName: authState.user.firstName,
+      id: authState.user?._id,
+      isTyping: false,
+    });
     socket.emit("send_message", body);
     inputRef.current.value = "";
     imageRef.current = "";
@@ -83,7 +90,10 @@ const ChatInputComponent = ({
   };
 
   const onChangeInput = () => {
-    if (!isUserTyping) {
+    if (
+      !userTypingInfo.current.isTyping ||
+      userTypingInfo.current.id !== authState.user?._id
+    ) {
       socket.emit("user-input", {
         connectionId: state?.user.connectionId,
         firstName: authState.user.firstName,
@@ -98,8 +108,8 @@ const ChatInputComponent = ({
       <UserTypingStatus
         socket={socket}
         userId={authState.user._id}
-        onUserStoppedTyping={(typing: boolean) => {
-          isUserTyping = typing;
+        onUserStoppedTyping={(typingInfo: any) => {
+          userTypingInfo.current = typingInfo;
         }}
       />
       <div className={Styles.messageInputWrapper}>
