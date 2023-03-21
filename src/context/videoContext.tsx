@@ -30,7 +30,8 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const [receiverInfo, setReceiverInfo] = useState<CallerInfo>({});
   const [remoteTrackMuted, setRemoteTrackMuted] = useState<boolean>(false);
   const [remoteVideo, setRemoteVideo] = useState(null);
-  const [videoPausedSuccess, setVideoPausedSuccess] = useState(false);
+  const [userVideoInitialized, setUserVideoInitialized] = useState(null);
+  const [userVideoPaused, setUserVideoPaused] = useState(false);
 
   useEffect(() => {
     socket.on(
@@ -198,7 +199,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const onPressVideo = (payload: any) => {
     setReceiverInfo(payload);
-
     connectionId = payload.connectionId;
     setCallInitiated(true);
   };
@@ -206,6 +206,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const onClickVideo = () => {
     videoPaused = !videoPaused;
     if (videoPaused) {
+      setUserVideoPaused(true);
       const senders = peerRef.current.getSenders();
       userVideoRef.current.srcObject.getTracks().forEach((track: any) => {
         track.enabled = false;
@@ -235,6 +236,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         // videoTrack.onended = function () {
         //   sender.replaceTrack(stream.getTracks()[1]);
         // };
+        setUserVideoPaused(false);
       });
   };
 
@@ -255,6 +257,14 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const endCall = () => {
     socket.emit("call_ended", { connectionId });
   };
+
+  useEffect(() => {
+    if (userVideoInitialized) {
+      console.log("userVideoInitialized -> ", userVideoInitialized);
+
+      initiateCall(userVideoInitialized);
+    }
+  }, [userVideoInitialized]);
 
   return (
     <VideoContext.Provider value={{ socket, callUser: onPressVideo }}>
@@ -284,15 +294,26 @@ const VideoContextProvider = ({ children }: { children: any }) => {
             style={{
               position: "absolute",
               right: 50,
-              bottom: -100,
+              bottom: userVideoPaused ? 50 : -100,
             }}
           >
-            <Video
-              ref={userVideoRef}
-              myVideo
-              initiateCall={initiateCall}
-              style={{ height: 600, width: 300 }}
-            />
+            {userVideoPaused ? (
+              <img
+                src={receiverInfo.image}
+                style={{
+                  height: 230,
+                  width: 370,
+                  objectFit: "contain",
+                }}
+              />
+            ) : (
+              <Video
+                ref={userVideoRef}
+                myVideo
+                initiateCall={(stream: any) => setUserVideoInitialized(stream)}
+                style={{ height: 600, width: 300 }}
+              />
+            )}
           </div>
           <div
             style={{
