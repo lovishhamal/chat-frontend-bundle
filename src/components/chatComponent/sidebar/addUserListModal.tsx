@@ -11,7 +11,6 @@ import Styles from "./addUserModal.module.css";
 import { ConnectionType } from "../../../enums/common";
 
 const AddUserListModal = (data: any) => {
-  const inputRef = useRef<any>(null);
   const { state: authState } = useContext<any>(AuthContext);
   const { state } = useContext<any>(ChatContext);
   const [users, setUsers] = useState<IUserProps[]>([]);

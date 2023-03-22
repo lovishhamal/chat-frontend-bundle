@@ -287,6 +287,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
               <Video
                 ref={partnerVideoRef}
                 style={{ height: "100vh", width: "100vw" }}
+                muted={false}
               />
             )}
           </div>
@@ -299,7 +300,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
           >
             {userVideoPaused ? (
               <img
-                src={receiverInfo.image}
+                src={state.user?.image?.data}
                 style={{
                   height: 230,
                   width: 370,
