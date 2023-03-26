@@ -260,8 +260,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   useEffect(() => {
     if (userVideoInitialized) {
-      console.log("userVideoInitialized -> ", userVideoInitialized);
-
       initiateCall(userVideoInitialized);
     }
   }, [userVideoInitialized]);
