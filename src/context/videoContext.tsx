@@ -277,19 +277,18 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         video: true,
         audio: true,
       });
-      console.log("ttt");
 
       setStream(stream);
-      console.log("ttt1", stream);
+
       const options = { mimeType: "video/webm; codecs=vp9" };
       const mediaRecorder = new MediaRecorder(stream, options);
-      console.log("media recorder");
+
       mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) {
           chunksRef.current.push(e.data);
         }
       };
-      console.log("media recorder1");
+
       mediaRecorder.onstop = () => {
         const blob = new Blob(chunksRef.current, {
           type: "video/webm",
@@ -303,7 +302,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
         chunksRef.current = [];
       };
-      console.log("media recorder2");
+
       mediaRecorderRef.current = mediaRecorder;
       mediaRecorderRef.current.start();
 
