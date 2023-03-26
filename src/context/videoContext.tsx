@@ -7,6 +7,8 @@ import {
   CloseOutlined,
   VideoCameraOutlined,
   PlaySquareOutlined,
+  DownCircleOutlined,
+  StopOutlined,
 } from "@ant-design/icons";
 import { CallerInfo } from "../interface/components/chat/chatInterface";
 
@@ -21,6 +23,8 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   );
 
+  const mediaRecorderRef = useRef<any>(null);
+  const chunksRef = useRef<any>([]);
   const modalRef = useRef<any>(null);
   const userVideoRef = useRef<any>(null);
   const partnerVideoRef = useRef<any>(null);
@@ -32,6 +36,8 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const [remoteVideo, setRemoteVideo] = useState(null);
   const [userVideoInitialized, setUserVideoInitialized] = useState(null);
   const [userVideoPaused, setUserVideoPaused] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [stream, setStream] = useState<any>({});
 
   useEffect(() => {
     socket.on(
@@ -96,16 +102,15 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     return peer;
   };
 
-
-const callUser = (userID: any) => {
-  setCallInitiated(true);
-  peerRef.current = createPeer(userID);
-  userVideoRef.current.srcObject
-    .getTracks()
-    .forEach((track: any) =>
-      peerRef.current.addTrack(track, userVideoRef.current.srcObject)
-    );
-};
+  const callUser = (userID: any) => {
+    setCallInitiated(true);
+    peerRef.current = createPeer(userID);
+    userVideoRef.current.srcObject
+      .getTracks()
+      .forEach((track: any) =>
+        peerRef.current.addTrack(track, userVideoRef.current.srcObject)
+      );
+  };
 
   const handleNegotiationNeededEvent = (userId: any) => {
     peerRef.current
@@ -266,8 +271,53 @@ const callUser = (userID: any) => {
     }
   }, [userVideoInitialized]);
 
-  console.log("call initiated -> ", callInitiated);
-  console.log("userVideoPaused -> ", userVideoPaused);
+  const onClickRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: true,
+      });
+      console.log("ttt");
+
+      setStream(stream);
+      console.log("ttt1", stream);
+      const options = { mimeType: "video/webm; codecs=vp9" };
+      const mediaRecorder = new MediaRecorder(stream, options);
+      console.log("media recorder");
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunksRef.current.push(e.data);
+        }
+      };
+      console.log("media recorder1");
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, {
+          type: "video/webm",
+        });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "screen-record.webm";
+        a.click();
+
+        chunksRef.current = [];
+      };
+      console.log("media recorder2");
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorderRef.current.start();
+
+      setRecording(true);
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current.stop();
+    setRecording(false);
+    setStream(null);
+  };
 
   return (
     <VideoContext.Provider value={{ socket, callUser: onPressVideo }}>
@@ -380,6 +430,40 @@ const callUser = (userID: any) => {
               }}
             >
               <PlaySquareOutlined style={{ color: "#ffffff" }} />
+            </div>
+            <div
+              onClick={screenShare}
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <DownCircleOutlined
+                style={{ color: "#ffffff" }}
+                onClick={onClickRecording}
+              />
+            </div>
+            <div
+              onClick={screenShare}
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <StopOutlined
+                style={{ color: "#ffffff" }}
+                onClick={stopRecording}
+              />
             </div>
           </div>
         </div>
