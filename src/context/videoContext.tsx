@@ -7,6 +7,8 @@ import {
   CloseOutlined,
   VideoCameraOutlined,
   PlaySquareOutlined,
+  DownCircleOutlined,
+  StopOutlined,
 } from "@ant-design/icons";
 import { CallerInfo } from "../interface/components/chat/chatInterface";
 
@@ -21,6 +23,8 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   );
 
+  const mediaRecorderRef = useRef<any>(null);
+  const chunksRef = useRef<any>([]);
   const modalRef = useRef<any>(null);
   const userVideoRef = useRef<any>(null);
   const partnerVideoRef = useRef<any>(null);
@@ -30,7 +34,9 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const [receiverInfo, setReceiverInfo] = useState<CallerInfo>({});
   const [remoteTrackMuted, setRemoteTrackMuted] = useState<boolean>(false);
   const [remoteVideo, setRemoteVideo] = useState(null);
-  const [videoPausedSuccess, setVideoPausedSuccess] = useState(false);
+  const [userVideoInitialized, setUserVideoInitialized] = useState(null);
+  const [userVideoPaused, setUserVideoPaused] = useState(false);
+  const [stream, setStream] = useState<any>({});
 
   useEffect(() => {
     socket.on(
@@ -96,6 +102,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const callUser = (userID: any) => {
+    setCallInitiated(true);
     peerRef.current = createPeer(userID);
     userVideoRef.current.srcObject
       .getTracks()
@@ -198,7 +205,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const onPressVideo = (payload: any) => {
     setReceiverInfo(payload);
-
     connectionId = payload.connectionId;
     setCallInitiated(true);
   };
@@ -206,6 +212,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const onClickVideo = () => {
     videoPaused = !videoPaused;
     if (videoPaused) {
+      setUserVideoPaused(true);
       const senders = peerRef.current.getSenders();
       userVideoRef.current.srcObject.getTracks().forEach((track: any) => {
         track.enabled = false;
@@ -235,6 +242,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
         // videoTrack.onended = function () {
         //   sender.replaceTrack(stream.getTracks()[1]);
         // };
+        setUserVideoPaused(false);
       });
   };
 
@@ -249,11 +257,54 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       // videoTrack.onended = function () {
       //   sender.replaceTrack(stream.getTracks()[1]);
       // };
+      setStream(stream);
     });
   };
 
   const endCall = () => {
     socket.emit("call_ended", { connectionId });
+  };
+
+  useEffect(() => {
+    if (userVideoInitialized) {
+      initiateCall(userVideoInitialized);
+    }
+  }, [userVideoInitialized]);
+
+  const onClickRecording = async () => {
+    try {
+      const options = { mimeType: "video/webm; codecs=vp9" };
+
+      const mediaRecorder = new MediaRecorder(stream, options);
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunksRef.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, {
+          type: "video/webm",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "screen-record.webm";
+        a.click();
+
+        chunksRef.current = [];
+      };
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorderRef.current.start();
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current.stop();
+    setStream(null);
   };
 
   return (
@@ -277,6 +328,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
               <Video
                 ref={partnerVideoRef}
                 style={{ height: "100vh", width: "100vw" }}
+                muted={false}
               />
             )}
           </div>
@@ -284,15 +336,26 @@ const VideoContextProvider = ({ children }: { children: any }) => {
             style={{
               position: "absolute",
               right: 50,
-              bottom: -100,
+              bottom: userVideoPaused ? 50 : -100,
             }}
           >
-            <Video
-              ref={userVideoRef}
-              myVideo
-              initiateCall={initiateCall}
-              style={{ height: 600, width: 300 }}
-            />
+            {userVideoPaused ? (
+              <img
+                src={state.user?.image?.data}
+                style={{
+                  height: 230,
+                  width: 370,
+                  objectFit: "contain",
+                }}
+              />
+            ) : (
+              <Video
+                ref={userVideoRef}
+                myVideo
+                initiateCall={(stream: any) => setUserVideoInitialized(stream)}
+                style={{ height: 600, width: 300 }}
+              />
+            )}
           </div>
           <div
             style={{
@@ -312,6 +375,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                cursor: "pointer",
               }}
               onClick={() => {
                 userVideoRef.current.srcObject
@@ -320,7 +384,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                     track.enabled = false;
                     track.stop();
                   });
-                peerRef.current.close();
+                peerRef?.current?.close();
                 setCallInitiated(false);
                 endCall();
               }}
@@ -338,6 +402,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                cursor: "pointer",
               }}
             >
               <VideoCameraOutlined style={{ color: "#ffffff" }} />
@@ -352,9 +417,42 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                cursor: "pointer",
               }}
             >
               <PlaySquareOutlined style={{ color: "#ffffff" }} />
+            </div>
+            <div
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >
+              <DownCircleOutlined
+                style={{ color: "#ffffff" }}
+                onClick={onClickRecording}
+              />
+            </div>
+            <div
+              onClick={stopRecording}
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >
+              <StopOutlined style={{ color: "#ffffff" }} />
             </div>
           </div>
         </div>

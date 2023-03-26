@@ -11,7 +11,6 @@ import { SET_LOGGED_IN_USER } from "../constants/actions";
 import { LOCAL_STORAGE } from "../constants/common";
 import { uiRoutes } from "../constants/uiRoutes";
 import { AuthContext } from "../context";
-
 import { LocalStorage } from "../util/localStorage";
 
 const LoginPage = LazyLoader(lazy(() => import("../pages/auth/login")));
