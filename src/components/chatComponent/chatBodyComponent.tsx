@@ -1,39 +1,26 @@
-import { Divider, List } from "antd";
-import { useContext, useEffect, useRef, useState } from "react";
-import { ChatContext } from "../../context/chatContext";
-import { IMessage } from "../../interface/components/chat/chatInterface";
-
-import {
-  SendOutlined,
-  PlusOutlined,
-  PhoneOutlined,
-  VideoCameraOutlined,
-  CloseOutlined,
-} from "@ant-design/icons";
-import { getCurrentDate } from "../../util/date";
-import { SET_MESSAGE } from "../../constants/actions";
-import { SenderBoxComponent } from "./senderBoxComponent";
-import { ReceiverBoxComponent } from "./receiverBoxComponent";
-import { AuthContext } from "../../context";
+import { useContext, useEffect, useRef } from "react";
+import { ChatContext, AuthContext, VideoContext } from "../../context";
+import { SET_MESSAGE } from "../../constants";
 import { LocalStorage } from "../../util/localStorage";
-import Styles from "./chatBodyComponent.module.css";
-import { CustomModal, UploadPhoto } from "../../common";
-import AvatarComponent from "../../common/avatar";
-import { VideoContext } from "../../context/videoContext";
+import { CustomModal } from "../../common";
 import AddUserListModal from "./sidebar/addUserListModal";
-import HocComponent from "../../hoc/hoc";
+import ChatBoxComponent from "./chatBoxComponent";
+import ChatBoxHeaderComponent from "./chatBoxHeaderComponent";
+import ChatInputComponent from "./chatInputComponent";
+import Styles from "./chatBodyComponent.module.css";
+import UserTypingStatus from "./userTypingStatus";
 
 export const ChatBodyComponent = () => {
-  const { socket, callUser } = useContext<any>(VideoContext);
+  const messagesEndRef = useRef<any>(null);
+  const modalRef = useRef<any>(null);
+
+  const { socket } = useContext<any>(VideoContext);
   const { state, dispatch } = useContext<any>(ChatContext);
   const { state: authState } = useContext<any>(AuthContext);
 
-  const messagesEndRef = useRef<any>(null);
-  const modalRef = useRef<any>(null);
-  const inputRef = useRef<any>(null);
-  const imageRef = useRef<any>(null);
-
-  const [showUploadFile, setShowUploadFile] = useState<boolean>(false);
+  const closeModal = () => {
+    modalRef.current.closeModal();
+  };
 
   useEffect(() => {
     socket.emit("new-user-add", authState.user?._id);
@@ -61,135 +48,18 @@ export const ChatBodyComponent = () => {
     }
   }, [messagesEndRef.current, state]);
 
-  const onClickSend = () => {
-    let message: any = {
-      connectionId: state?.user.connectionId,
-      sentBy: authState.user?._id,
-      sentTo: state.user._id,
-      text: inputRef.current.value,
-      updatedAt: getCurrentDate(),
-    };
-    if (imageRef.current) {
-      const image = {
-        name: imageRef.current.name,
-        size: imageRef.current.size,
-        data: imageRef.current.thumbUrl,
-        type: imageRef.current.type,
-      };
-      message = { ...message, image };
-    }
-
-    const body = {
-      messageId: state?.user.messageId,
-      createdAt: getCurrentDate(),
-      connectionId: state?.user.connectionId,
-      message,
-    };
-    socket.emit("send_message", body);
-    inputRef.current.value = "";
-  };
-
-  const closeModal = () => {
-    modalRef.current.closeModal();
-  };
-
   return (
     <>
-      <CustomModal ref={modalRef} title='Create a group' footer={false}>
+      <CustomModal ref={modalRef} title="Create a group" footer={false}>
         <AddUserListModal closeModal={closeModal} />
       </CustomModal>
-      <div style={{ width: "100%" }}>
-        <div className={Styles.header}>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <AvatarComponent image={state.user?.image?.data} />
-            <h1 style={{ textTransform: "capitalize" }}>
-              {state.user.userName}
-            </h1>
-          </div>
-          <div className={Styles.iconWrapper}>
-            <div
-              className={Styles.icon}
-              onClick={() => modalRef.current.openModal(state.user._id)}
-            >
-              <PlusOutlined />
-            </div>
-            <div className={Styles.iconGap} />
-            <div className={Styles.icon}>
-              <PhoneOutlined />
-            </div>
-            <div className={Styles.iconGap} />
-            <div
-              className={Styles.icon}
-              onClick={() => {
-                const receiver = {
-                  connectionId: state.user.connectionId,
-                  receiver_id: state.user._id,
-                  caller_id: authState.user._id,
-                  name: authState.user.userName,
-                  image: authState.user.image.data,
-                };
-                callUser(receiver);
-              }}
-            >
-              <VideoCameraOutlined />
-            </div>
-          </div>
+      <div className={Styles.chatBoxWrapper}>
+        <div className={Styles.chatBoxBody}>
+          <ChatBoxHeaderComponent modalRef={modalRef} />
+          <ChatBoxComponent />
+          <div ref={messagesEndRef} />
         </div>
-        <div className={Styles.mainChatContent}>
-          <div
-            className={
-              showUploadFile ? Styles.contentBody : Styles.contentBodyOverflow
-            }
-          >
-            <List
-              style={{ width: "100%", overflow: "scroll" }}
-              itemLayout='horizontal'
-              dataSource={state.messages}
-              renderItem={(item: IMessage) => {
-                return (
-                  <>
-                    {authState?.user._id === item.sentBy ? (
-                      <SenderBoxComponent item={item} />
-                    ) : (
-                      <ReceiverBoxComponent item={item} />
-                    )}
-                    <div ref={messagesEndRef} />
-                  </>
-                );
-              }}
-            />
-          </div>
-          <div className={Styles.messageInputWrapper}>
-            {showUploadFile && (
-              <div>
-                <UploadPhoto
-                  handleChange={(item: any) => (imageRef.current = item)}
-                />
-                <Divider />
-              </div>
-            )}
-            <div className={Styles.sendNewMessage}>
-              <button
-                className='addFiles'
-                onClick={() => setShowUploadFile(!showUploadFile)}
-              >
-                {showUploadFile ? <CloseOutlined /> : <PlusOutlined />}
-              </button>
-              <input
-                type='text'
-                placeholder='Type a message here'
-                ref={inputRef}
-              />
-              <button
-                className='btnSendMsg'
-                id='sendMsgBtn'
-                onClick={onClickSend}
-              >
-                <SendOutlined />
-              </button>
-            </div>
-          </div>
-        </div>
+        <ChatInputComponent socket={socket} authState={authState} />
       </div>
     </>
   );

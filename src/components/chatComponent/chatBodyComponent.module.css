@@ -1,19 +1,45 @@
 .mainChatContent {
-  width: 100%;
-  padding: 20px 40px;
+  padding: 10px 10px;
   border-right: 1px solid #ebe7fb;
-  height: 70vh;
   padding-left: 0px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.contentBody {
-  height: calc(100% - (270px));
-  overflow: auto;
+.mainChatContent::-webkit-scrollbar{
+ display: none;
 }
 
-.contentBodyOverflow {
-  height: calc(100% - (-40px));
-  overflow: auto;
+.list {
+   -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.list::-webkit-scrollbar{
+ display: none;
+}
+
+
+.chatBoxWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+
+
+.chatBoxBody {
+  justify-self: flex-start;
+  height: 100%;
+  overflow: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.chatBoxBody::-webkit-scrollbar{
+ display: none;
 }
 
 .contentFooter {
@@ -22,14 +48,7 @@
 
 .messageInputWrapper {
   background-color: #fff;
-  display: flex;
-  flex-direction: column;
-  z-index: 100;
 }
-
-/* .messageInputWrapper .overflow {
-  margin-top: -300px;
-} */
 
 .sendNewMessage {
   display: flex;
@@ -77,17 +96,12 @@
   transform: scale(0);
   transform-origin: right;
   animation-name: showIn;
-  animation-duration: 0.2s; /* or: Xms */
+  animation-duration: 0.2s;
   animation-iteration-count: 1;
-  animation-direction: normal; /* or: normal */
-  animation-timing-function: cubic-bezier(
-    0.88,
-    0.19,
-    0.37,
-    1.11
-  ); /* or: ease, ease-in, ease-in-out, linear, cubic-bezier(x1, y1, x2, y2) */
-  animation-fill-mode: both; /* or: backwards, both, none */
-  animation-delay: 0.2s; /* or: Xms */
+  animation-direction: normal;
+  animation-timing-function: cubic-bezier(0.88, 0.19, 0.37, 1.11);
+  animation-fill-mode: both;
+  animation-delay: 0.2s;
 }
 
 @keyframes showIn {
@@ -123,13 +137,16 @@
 
 .header {
   padding: 0px;
-  margin: 0px;
+  margin: 10px;
   display: flex;
   justify-content: space-between;
   background-color: #fff;
   padding: 0px 10px 0px 10px;
   border-radius: 5px;
   margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .icon {

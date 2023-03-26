@@ -31,47 +31,55 @@ const LoginPage = () => {
 
   return (
     <MainLayout>
-      <Card style={{ minWidth: "20%" }}>
+      <Card
+        style={{
+          minWidth: "20%",
+          alignItems: "center",
+          justifyContent: "center",
+          display: "flex",
+          height: "100vh",
+        }}
+      >
         <Form
-          name='normal_login'
-          className='login-form'
+          name="normal_login"
+          className="login-form"
           initialValues={{ remember: true }}
           onFinish={onFinish}
         >
           <Form.Item
-            name='userName'
+            name="userName"
             rules={[{ required: true, message: "Please input your Username!" }]}
           >
             <Input
-              prefix={<UserOutlined className='site-form-item-icon' />}
-              placeholder='Username'
+              prefix={<UserOutlined className="site-form-item-icon" />}
+              placeholder="Username"
             />
           </Form.Item>
           <Form.Item
-            name='password'
+            name="password"
             rules={[{ required: true, message: "Please input your Password!" }]}
           >
             <Input
-              prefix={<LockOutlined className='site-form-item-icon' />}
-              type='password'
-              placeholder='Password'
+              prefix={<LockOutlined className="site-form-item-icon" />}
+              type="password"
+              placeholder="Password"
             />
           </Form.Item>
           <Form.Item>
-            <Form.Item name='remember' valuePropName='checked' noStyle>
+            <Form.Item name="remember" valuePropName="checked" noStyle>
               <Checkbox>Remember me</Checkbox>
             </Form.Item>
 
-            <a className='login-form-forgot' href=''>
+            <a className="login-form-forgot" href="">
               Forgot password
             </a>
           </Form.Item>
           <Form.Item>
             <Button
               style={{ width: "100%" }}
-              type='primary'
-              htmlType='submit'
-              className='login-form-button'
+              type="primary"
+              htmlType="submit"
+              className="login-form-button"
             >
               Log in
             </Button>
@@ -90,9 +98,9 @@ const LoginPage = () => {
             <Button
               onClick={() => navigate(uiRoutes.auth.register)}
               style={{ width: "100%" }}
-              type='primary'
-              htmlType='submit'
-              className='login-form-button'
+              type="primary"
+              htmlType="submit"
+              className="login-form-button"
             >
               Register
             </Button>

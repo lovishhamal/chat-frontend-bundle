@@ -3,34 +3,48 @@ import { Avatar, CustomModal } from "../common";
 import { socketIo } from "../util/socket";
 import { AuthContext } from "./authContext";
 import Video from "../components/context/video";
-import { CloseOutlined, VideoCameraOutlined } from "@ant-design/icons";
+import {
+  CloseOutlined,
+  VideoCameraOutlined,
+  PlaySquareOutlined,
+  DownCircleOutlined,
+  StopOutlined,
+} from "@ant-design/icons";
+import { CallerInfo } from "../interface/components/chat/chatInterface";
 
 export const VideoContext = createContext({});
 const socket = socketIo();
-
-let receiverInfo: any = {};
 let connectionId: string = "";
 
+let videoPaused = false;
 const VideoContextProvider = ({ children }: { children: any }) => {
   const { state } = useContext<any>(AuthContext);
   const audio = new Audio(
     "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   );
 
+  const mediaRecorderRef = useRef<any>(null);
+  const chunksRef = useRef<any>([]);
   const modalRef = useRef<any>(null);
   const userVideoRef = useRef<any>(null);
   const partnerVideoRef = useRef<any>(null);
   const peerRef = useRef<any>();
   const otherUser = useRef<any>();
-
   const [callInitiated, setCallInitiated] = useState<boolean>(false);
+  const [receiverInfo, setReceiverInfo] = useState<CallerInfo>({});
+  const [remoteTrackMuted, setRemoteTrackMuted] = useState<boolean>(false);
+  const [remoteVideo, setRemoteVideo] = useState(null);
+  const [userVideoInitialized, setUserVideoInitialized] = useState(null);
+  const [userVideoPaused, setUserVideoPaused] = useState(false);
+  const [stream, setStream] = useState<any>({});
 
   useEffect(() => {
     socket.on(
       "call_user",
       ({ connectionId: connection_id, receiverInfo: receiver_info }) => {
         if (state.user._id === receiver_info.receiver_id) {
-          receiverInfo = receiver_info;
+          console.log("receiver_info.receiver_id -> ", receiver_info);
+          setReceiverInfo(receiver_info);
           connectionId = connection_id;
           modalRef.current.openModal();
         }
@@ -51,7 +65,20 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     socket.on("answer", handleAnswer);
 
     socket.on("ice_candidate", handleNewICECandidateMsg);
+
+    socket.on("call_ended", (payload) => {
+      setCallInitiated(false);
+      partnerVideoRef.current = null;
+    });
+
+    socket.on("video_paused", (data: any) => {});
   }, []);
+
+  useEffect(() => {
+    if (remoteVideo) {
+      partnerVideoRef.current.srcObject = remoteVideo;
+    }
+  }, [remoteVideo]);
 
   const createPeer = (userID?: any) => {
     const peer = new RTCPeerConnection({
@@ -75,6 +102,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   const callUser = (userID: any) => {
+    setCallInitiated(true);
     peerRef.current = createPeer(userID);
     userVideoRef.current.srcObject
       .getTracks()
@@ -95,6 +123,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
           caller: socket.id,
           sdp: peerRef.current.localDescription,
         };
+
         socket.emit("offer", payload);
       })
       .catch((e: any) => console.log(e));
@@ -106,11 +135,9 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     peerRef.current
       .setRemoteDescription(desc)
       .then(() => {
-        userVideoRef.current.srcObject
-          .getTracks()
-          .forEach((track: any) =>
-            peerRef.current.addTrack(track, userVideoRef.current.srcObject)
-          );
+        userVideoRef.current.srcObject.getTracks().forEach((track: any) => {
+          peerRef.current.addTrack(track, userVideoRef.current.srcObject);
+        });
       })
       .then(() => {
         return peerRef.current.createAnswer();
@@ -154,35 +181,130 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   };
 
   function handleTrackEvent(e: any) {
-    partnerVideoRef.current.srcObject = e.streams[0];
+    e.track.addEventListener("mute", () => {
+      setRemoteVideo(null);
+      setRemoteTrackMuted(true);
+      socket.emit("video_paused", { userId: state.user._id });
+    });
+
+    e.track.addEventListener("unmute", () => {
+      setRemoteVideo(e.streams[0]);
+      setRemoteTrackMuted(false);
+    });
   }
 
-  const pauseAudio = () => audio.pause();
+  const pauseAudio = () => {
+    endCall();
+    audio.pause();
+  };
 
   const initiateCall = (stream: any) => {
     userVideoRef.current.srcObject = stream;
-
     socket.emit("join_room", { connectionId, receiverInfo });
   };
 
   const onPressVideo = (payload: any) => {
-    receiverInfo = payload;
-
+    setReceiverInfo(payload);
     connectionId = payload.connectionId;
     setCallInitiated(true);
   };
 
   const onClickVideo = () => {
-    userVideoRef.current.srcObject.getTracks().forEach((track: any) => {
-      if (track.readyState === "live" && track.kind === "video") {
+    videoPaused = !videoPaused;
+    if (videoPaused) {
+      setUserVideoPaused(true);
+      const senders = peerRef.current.getSenders();
+      userVideoRef.current.srcObject.getTracks().forEach((track: any) => {
         track.enabled = false;
         track.stop();
-      } else {
-        if (track.readyState === "ended" && track.kind === "video") {
-          track.enabled = true;
-        }
-      }
+        var sender = senders.find(function (s: any) {
+          return s.track.kind == track.kind;
+        });
+        sender.replaceTrack(track);
+      });
+    } else {
+      resumeVdo();
+    }
+    // userVideoRef.current.srcObject.removeTrack(prevTracks[0]);
+    // peerRef.current.removeTrack(prevTracks[0]);
+  };
+
+  const resumeVdo = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((stream) => {
+        let videoTrack = stream.getVideoTracks()[0];
+        const senders = peerRef.current.getSenders();
+        var sender = senders.find(function (s: any) {
+          return s.track.kind == videoTrack.kind;
+        });
+        sender.replaceTrack(videoTrack);
+        // videoTrack.onended = function () {
+        //   sender.replaceTrack(stream.getTracks()[1]);
+        // };
+        setUserVideoPaused(false);
+      });
+  };
+
+  const screenShare = () => {
+    navigator.mediaDevices.getDisplayMedia().then((stream) => {
+      let videoTrack = stream.getVideoTracks()[0];
+      const senders = peerRef.current.getSenders();
+      var sender = senders.find(function (s: any) {
+        return s.track.kind == videoTrack.kind;
+      });
+      sender.replaceTrack(videoTrack);
+      // videoTrack.onended = function () {
+      //   sender.replaceTrack(stream.getTracks()[1]);
+      // };
+      setStream(stream);
     });
+  };
+
+  const endCall = () => {
+    socket.emit("call_ended", { connectionId });
+  };
+
+  useEffect(() => {
+    if (userVideoInitialized) {
+      initiateCall(userVideoInitialized);
+    }
+  }, [userVideoInitialized]);
+
+  const onClickRecording = async () => {
+    try {
+      const options = { mimeType: "video/webm; codecs=vp9" };
+
+      const mediaRecorder = new MediaRecorder(stream, options);
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunksRef.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, {
+          type: "video/webm",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "screen-record.webm";
+        a.click();
+
+        chunksRef.current = [];
+      };
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorderRef.current.start();
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current.stop();
+    setStream(null);
   };
 
   return (
@@ -190,24 +312,50 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       {callInitiated ? (
         <div style={{ position: "relative", backgroundColor: "black" }}>
           <div>
-            <Video
-              ref={partnerVideoRef}
-              style={{ height: "100vh", width: "100vw" }}
-            />
+            {remoteTrackMuted ? (
+              <div
+                style={{
+                  height: "100vh",
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <img src={receiverInfo.image} />
+              </div>
+            ) : (
+              <Video
+                ref={partnerVideoRef}
+                style={{ height: "100vh", width: "100vw" }}
+                muted={false}
+              />
+            )}
           </div>
           <div
             style={{
               position: "absolute",
               right: 50,
-              bottom: -100,
+              bottom: userVideoPaused ? 50 : -100,
             }}
           >
-            <Video
-              ref={userVideoRef}
-              myVideo
-              initiateCall={initiateCall}
-              style={{ height: 600, width: 300 }}
-            />
+            {userVideoPaused ? (
+              <img
+                src={state.user?.image?.data}
+                style={{
+                  height: 230,
+                  width: 370,
+                  objectFit: "contain",
+                }}
+              />
+            ) : (
+              <Video
+                ref={userVideoRef}
+                myVideo
+                initiateCall={(stream: any) => setUserVideoInitialized(stream)}
+                style={{ height: 600, width: 300 }}
+              />
+            )}
           </div>
           <div
             style={{
@@ -227,6 +375,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                cursor: "pointer",
               }}
               onClick={() => {
                 userVideoRef.current.srcObject
@@ -235,16 +384,16 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                     track.enabled = false;
                     track.stop();
                   });
-                userVideoRef.current = null;
-                peerRef.current.close();
+                peerRef?.current?.close();
                 setCallInitiated(false);
+                endCall();
               }}
             >
               <CloseOutlined style={{ color: "#ffffff" }} />
             </div>
             <span style={{ margin: "0px 2px 0px 2px" }} />
             <div
-              onClick={onClickVideo}
+              onClick={() => onClickVideo()}
               style={{
                 backgroundColor: "red",
                 borderRadius: 100,
@@ -253,9 +402,57 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                cursor: "pointer",
               }}
             >
               <VideoCameraOutlined style={{ color: "#ffffff" }} />
+            </div>
+            <div
+              onClick={screenShare}
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >
+              <PlaySquareOutlined style={{ color: "#ffffff" }} />
+            </div>
+            <div
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >
+              <DownCircleOutlined
+                style={{ color: "#ffffff" }}
+                onClick={onClickRecording}
+              />
+            </div>
+            <div
+              onClick={stopRecording}
+              style={{
+                backgroundColor: "red",
+                borderRadius: 100,
+                width: 50,
+                height: 50,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >
+              <StopOutlined style={{ color: "#ffffff" }} />
             </div>
           </div>
         </div>
@@ -264,9 +461,9 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       )}
       <CustomModal
         ref={modalRef}
-        title='Video Call'
-        okText='Answer'
-        cancelText='Decline'
+        title="Video Call"
+        okText="Answer"
+        cancelText="Decline"
         onOkPress={() => {
           setCallInitiated(true);
         }}

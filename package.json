@@ -14,7 +14,9 @@
     "antd": "^5.0.2",
     "antd-img-crop": "^4.5.2",
     "axios": "^1.2.1",
+    "cross-env": "^7.0.3",
     "date-fns": "^2.29.3",
+    "env-cmd": "^10.1.0",
     "process": "^0.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -28,8 +30,9 @@
     "yarn": "^1.22.19"
   },
   "scripts": {
+    "dev": "env-cmd -f .env.dev react-scripts start",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "env-cmd -f .env react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

@@ -11,7 +11,6 @@ import Styles from "./addUserModal.module.css";
 import { ConnectionType } from "../../../enums/common";
 
 const AddUserListModal = (data: any) => {
-  const inputRef = useRef<any>(null);
   const { state: authState } = useContext<any>(AuthContext);
   const { state } = useContext<any>(ChatContext);
   const [users, setUsers] = useState<IUserProps[]>([]);
@@ -39,14 +38,18 @@ const AddUserListModal = (data: any) => {
     };
 
     createUserGroupService(payload)
-      .then((data) => {})
-      .catch((err) => {});
+      .then((data) => {
+        console.log("gg", data);
+      })
+      .catch((err) => {
+        console.log("err", err);
+      });
   };
 
   return (
     <>
       <List
-        itemLayout='horizontal'
+        itemLayout="horizontal"
         dataSource={users}
         renderItem={(item) => {
           return (

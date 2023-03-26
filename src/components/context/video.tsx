@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from "react";
 
-// remove this in production
+// remove this in production c=0 and related code
 
-let c = 0;
-const Video = React.forwardRef((props: any, ref: any) => {
-  useEffect(() => {
-    if (props.myVideo && !c) {
-      c++;
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((currentStream) => {
-          props.initiateCall(currentStream);
-        });
-    }
-  }, []);
+const Video = React.forwardRef(
+  ({ myVideo, initiateCall, muted = true, style }: any, ref: any) => {
+    let c = 0;
+    useEffect(() => {
+      if (myVideo && !c) {
+        c++;
+        navigator.mediaDevices
+          .getUserMedia({ video: true, audio: true })
+          .then((currentStream) => {
+            initiateCall(currentStream);
+          });
+      }
+    }, []);
 
-  return <video playsInline muted autoPlay ref={ref} style={props.style} />;
-});
+    return <video playsInline muted={muted} autoPlay ref={ref} style={style} />;
+  }
+);
 
 export default Video;

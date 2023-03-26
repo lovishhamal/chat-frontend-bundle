@@ -55,44 +55,52 @@ const RegisterPage = () => {
 
   return (
     <MainLayout>
-      <Card style={{ minWidth: "20%" }}>
+      <Card
+        style={{
+          minWidth: "20%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
         <Form
           style={{ width: "20vw" }}
-          name='normal_login'
-          className='login-form'
+          name="normal_login"
+          className="login-form"
           initialValues={{ remember: true }}
           onFinish={onFinish}
         >
           <Form.Item
-            name='userName'
+            name="userName"
             rules={[{ required: true, message: "Please input your Username!" }]}
           >
             <Input
-              prefix={<UserOutlined className='site-form-item-icon' />}
-              placeholder='Username'
+              prefix={<UserOutlined className="site-form-item-icon" />}
+              placeholder="Username"
             />
           </Form.Item>
           <Form.Item
-            name='email'
+            name="email"
             rules={[{ required: true, message: "Please input your Username!" }]}
           >
             <Input
-              prefix={<UserOutlined className='site-form-item-icon' />}
-              placeholder='Email'
+              prefix={<UserOutlined className="site-form-item-icon" />}
+              placeholder="Email"
             />
           </Form.Item>
           <Form.Item
-            name='password'
+            name="password"
             rules={[{ required: true, message: "Please input your Password!" }]}
           >
             <Input
-              prefix={<LockOutlined className='site-form-item-icon' />}
-              type='password'
-              placeholder='Password'
+              prefix={<LockOutlined className="site-form-item-icon" />}
+              type="password"
+              placeholder="Password"
             />
           </Form.Item>
           <Form.Item
-            name='confirmPassword'
+            name="confirmPassword"
             dependencies={["password"]}
             hasFeedback
             rules={[
@@ -115,17 +123,17 @@ const RegisterPage = () => {
             ]}
           >
             <Input
-              prefix={<LockOutlined className='site-form-item-icon' />}
-              type='password'
-              placeholder='Conffirm Password'
+              prefix={<LockOutlined className="site-form-item-icon" />}
+              type="password"
+              placeholder="Conffirm Password"
             />
           </Form.Item>
           <Form.Item>
             <Button
               style={{ width: "100%" }}
-              type='primary'
-              htmlType='submit'
-              className='login-form-button'
+              type="primary"
+              htmlType="submit"
+              className="login-form-button"
             >
               Register
             </Button>
@@ -139,8 +147,8 @@ const RegisterPage = () => {
           >
             <ImgCrop rotate>
               <Upload
-                action='https://www.mocky.io/v2/5cc8019d300000980a055e76'
-                listType='picture-card'
+                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                listType="picture-card"
                 fileList={fileList}
                 onChange={onChange}
                 onPreview={onPreview}
