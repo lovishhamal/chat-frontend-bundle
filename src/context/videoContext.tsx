@@ -36,7 +36,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
   const [remoteVideo, setRemoteVideo] = useState(null);
   const [userVideoInitialized, setUserVideoInitialized] = useState(null);
   const [userVideoPaused, setUserVideoPaused] = useState(false);
-  const [recording, setRecording] = useState(false);
   const [stream, setStream] = useState<any>({});
 
   useEffect(() => {
@@ -258,6 +257,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       // videoTrack.onended = function () {
       //   sender.replaceTrack(stream.getTracks()[1]);
       // };
+      setStream(stream);
     });
   };
 
@@ -273,14 +273,8 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const onClickRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
-        audio: true,
-      });
-
-      setStream(stream);
-
       const options = { mimeType: "video/webm; codecs=vp9" };
+
       const mediaRecorder = new MediaRecorder(stream, options);
 
       mediaRecorder.ondataavailable = (e) => {
@@ -294,7 +288,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
           type: "video/webm",
         });
         const url = URL.createObjectURL(blob);
-
         const a = document.createElement("a");
         a.href = url;
         a.download = "screen-record.webm";
@@ -302,11 +295,8 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
         chunksRef.current = [];
       };
-
       mediaRecorderRef.current = mediaRecorder;
       mediaRecorderRef.current.start();
-
-      setRecording(true);
     } catch (err) {
       console.error("Error:", err);
     }
@@ -314,7 +304,6 @@ const VideoContextProvider = ({ children }: { children: any }) => {
 
   const stopRecording = () => {
     mediaRecorderRef.current.stop();
-    setRecording(false);
     setStream(null);
   };
 
@@ -386,6 +375,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                cursor: "pointer",
               }}
               onClick={() => {
                 userVideoRef.current.srcObject
@@ -394,7 +384,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                     track.enabled = false;
                     track.stop();
                   });
-                peerRef.current.close();
+                peerRef?.current?.close();
                 setCallInitiated(false);
                 endCall();
               }}
@@ -412,6 +402,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                cursor: "pointer",
               }}
             >
               <VideoCameraOutlined style={{ color: "#ffffff" }} />
@@ -426,12 +417,12 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                cursor: "pointer",
               }}
             >
               <PlaySquareOutlined style={{ color: "#ffffff" }} />
             </div>
             <div
-              onClick={screenShare}
               style={{
                 backgroundColor: "red",
                 borderRadius: 100,
@@ -440,6 +431,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                cursor: "pointer",
               }}
             >
               <DownCircleOutlined
@@ -448,7 +440,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
               />
             </div>
             <div
-              onClick={screenShare}
+              onClick={stopRecording}
               style={{
                 backgroundColor: "red",
                 borderRadius: 100,
@@ -457,12 +449,10 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                cursor: "pointer",
               }}
             >
-              <StopOutlined
-                style={{ color: "#ffffff" }}
-                onClick={stopRecording}
-              />
+              <StopOutlined style={{ color: "#ffffff" }} />
             </div>
           </div>
         </div>
