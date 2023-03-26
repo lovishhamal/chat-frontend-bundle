@@ -96,14 +96,16 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     return peer;
   };
 
-  const callUser = (userID: any) => {
-    peerRef.current = createPeer(userID);
-    userVideoRef.current.srcObject
-      .getTracks()
-      .forEach((track: any) =>
-        peerRef.current.addTrack(track, userVideoRef.current.srcObject)
-      );
-  };
+
+const callUser = (userID: any) => {
+  setCallInitiated(true);
+  peerRef.current = createPeer(userID);
+  userVideoRef.current.srcObject
+    .getTracks()
+    .forEach((track: any) =>
+      peerRef.current.addTrack(track, userVideoRef.current.srcObject)
+    );
+};
 
   const handleNegotiationNeededEvent = (userId: any) => {
     peerRef.current
@@ -263,6 +265,9 @@ const VideoContextProvider = ({ children }: { children: any }) => {
       initiateCall(userVideoInitialized);
     }
   }, [userVideoInitialized]);
+
+  console.log("call initiated -> ", callInitiated);
+  console.log("userVideoPaused -> ", userVideoPaused);
 
   return (
     <VideoContext.Provider value={{ socket, callUser: onPressVideo }}>
