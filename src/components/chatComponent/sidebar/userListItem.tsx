@@ -11,7 +11,7 @@ const UserListItem = ({
 }: {
   index: number;
   selectedUserId?: string;
-  item: IUserProps;
+  item: any;
   onPress: (item: any) => void;
 }) => {
   return (
@@ -31,9 +31,9 @@ const UserListItem = ({
       <AvatarComponent
         image={item.image ? item.image.data : "http://placehold.it/80x80"}
       />
-      <div className='userMeta'>
-        <p className={Styles.userName}>{item.userName}</p>
-        <span className='activeTime'>32 mins ago</span>
+      <div className="userMeta">
+        <p className={Styles.userName}>{item.userName || item.displayName}</p>
+        <span className="activeTime">32 mins ago</span>
       </div>
     </div>
   );

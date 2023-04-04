@@ -307,6 +307,17 @@ const VideoContextProvider = ({ children }: { children: any }) => {
     setStream(null);
   };
 
+  const compressVideo = () => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = 640;
+    canvas.height = 480;
+
+    // create a video track to send compressed video to the remote peer
+    const compressedStream = canvas.captureStream();
+    const compressedVideoTrack = compressedStream.getVideoTracks()[0];
+  };
+
   return (
     <VideoContext.Provider value={{ socket, callUser: onPressVideo }}>
       {callInitiated ? (
@@ -378,7 +389,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 cursor: "pointer",
               }}
               onClick={() => {
-                userVideoRef.current.srcObject
+                userVideoRef.current?.srcObject
                   .getTracks()
                   .forEach((track: any) => {
                     track.enabled = false;
@@ -439,7 +450,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
                 onClick={onClickRecording}
               />
             </div>
-            <div
+            {/* <div
               onClick={stopRecording}
               style={{
                 backgroundColor: "red",
@@ -453,7 +464,7 @@ const VideoContextProvider = ({ children }: { children: any }) => {
               }}
             >
               <StopOutlined style={{ color: "#ffffff" }} />
-            </div>
+            </div> */}
           </div>
         </div>
       ) : (

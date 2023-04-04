@@ -10,7 +10,7 @@ import { CheckCircleOutlined } from "@ant-design/icons";
 import Styles from "./addUserModal.module.css";
 import { ConnectionType } from "../../../enums/common";
 
-const AddUserListModal = (data: any) => {
+const AddUserListModal = ({ closeModal }: any) => {
   const { state: authState } = useContext<any>(AuthContext);
   const { state } = useContext<any>(ChatContext);
   const [users, setUsers] = useState<IUserProps[]>([]);
@@ -33,17 +33,13 @@ const AddUserListModal = (data: any) => {
   const onCreate = () => {
     const payload = {
       creatorId: authState.user._id,
-      connectionIds: selectedUserId,
+      connectionIds: [...selectedUserId, authState.user._id],
       connectionType: ConnectionType.GROUP,
     };
 
     createUserGroupService(payload)
-      .then((data) => {
-        console.log("gg", data);
-      })
-      .catch((err) => {
-        console.log("err", err);
-      });
+      .then((data) => closeModal())
+      .catch((err) => closeModal());
   };
 
   return (
