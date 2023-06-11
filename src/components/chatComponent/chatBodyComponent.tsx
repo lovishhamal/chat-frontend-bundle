@@ -8,7 +8,6 @@ import ChatBoxComponent from "./chatBoxComponent";
 import ChatBoxHeaderComponent from "./chatBoxHeaderComponent";
 import ChatInputComponent from "./chatInputComponent";
 import Styles from "./chatBodyComponent.module.css";
-import UserTypingStatus from "./userTypingStatus";
 
 export const ChatBodyComponent = () => {
   const messagesEndRef = useRef<any>(null);
@@ -17,6 +16,7 @@ export const ChatBodyComponent = () => {
   const { socket } = useContext<any>(VideoContext);
   const { state, dispatch } = useContext<any>(ChatContext);
   const { state: authState } = useContext<any>(AuthContext);
+  console.log("cc", state);
 
   const closeModal = () => {
     modalRef.current.closeModal();

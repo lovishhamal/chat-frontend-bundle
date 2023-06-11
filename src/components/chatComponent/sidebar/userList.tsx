@@ -15,7 +15,6 @@ const UserList = () => {
   const { state } = useContext<any>(AuthContext);
   const { state: chatState, dispatch } = useContext<any>(ChatContext);
 
-
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<IUserProps[]>([]);
 
@@ -67,7 +66,6 @@ const UserList = () => {
     setUsers([]);
     setLoading(false);
   };
-
 
   return (
     <InfiniteScroll
